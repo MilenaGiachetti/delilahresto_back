@@ -1,9 +1,16 @@
 /*password no parece ser sensible a Mayus..averiguar*/
 /*encriptar password en la db*/
+
 /*validar que en creacion de usuarios no se repita mail/usuario ya existente*/
+/*validar que en creacion de usuarios no se repita abreviacin/(descripcion tal vez tmbn) ya existente*/
+/*agregar que estos elementos son unicos en la info de la db*/
+
 /*deberian administradores poder eliminar usuarios?*/
+
 /*ordernar json de ver un pedido*/
-/*add al the catchs*/
+
+/*pensar mejor el contenido de los catchs*/
+
 /*check that updates dont change elements unique column values to repeated ones*/
 
 let express    = require('express'),
@@ -44,6 +51,10 @@ const authenticateUser = (req, res, next) => {
                 req.user = user;
                 next();
             }
+        }).catch((err)=>{
+            console.log(err);
+            res.status(500);
+            res.render('error', { error: err });
         })
     }
 }
@@ -69,6 +80,10 @@ const authorizateUser = (req, res, next) => {
                 /*is given access to existent users that have ADMIN ROL*/
                 next();
             }
+        }).catch((err)=>{
+            console.log(err);
+            res.status(500);
+            res.render('error', { error: err });
         })
     }
 }
@@ -117,7 +132,15 @@ app.post('/users', (req,res) => {
                         /*it should also return the token so it can be already logged in*/
                         res.json(new_user);
                     }
+                }).catch((err)=>{
+                    console.log(err);
+                    res.status(500);
+                    res.render('error', { error: err });
                 })
+            }).catch((err)=>{
+                console.log(err);
+                res.status(500);
+                res.render('error', { error: err });
             })
         } else {
             //error handling when there is/are repeated username and/or email
@@ -145,9 +168,11 @@ app.post('/users', (req,res) => {
                 res.status(400).send(`Error: ya existe un usuario con este nombre o email`);
             }
         }
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500);
+        res.render('error', { error: err });
     })
-
-    
 })
 
 /*example of info to send in the body:
@@ -183,6 +208,10 @@ app.post('/users', (req,res) => {
         } else {
             res.json(all_users);
         }
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500);
+        res.render('error', { error: err });
     })
 })*/
 
@@ -201,6 +230,10 @@ app.get('/users/:id', authenticateUser, (req,res) => {
             } else {
                 res.json(user);
             }
+        }).catch((err)=>{
+            console.log(err);
+            res.status(500);
+            res.render('error', { error: err });
         })
     } else {
         res.status(403).send("Error: no se encuentra autorizado a ver esta información");
@@ -249,11 +282,23 @@ app.put('/users/:id', authenticateUser, (req,res) => {
                         } else {
                             res.json(new_user);
                         }
+                    }).catch((err)=>{
+                        console.log(err);
+                        res.status(500);
+                        res.render('error', { error: err });
                     })     
+                }).catch((err)=>{
+                    console.log(err);
+                    res.status(500);
+                    res.render('error', { error: err });
                 })           
             } else {
                 res.send(`Error: no hay usuario con el id ${req.params.id}`)
             }
+        }).catch((err)=>{
+            console.log(err);
+            res.status(500);
+            res.render('error', { error: err });
         })
     } else {
         res.status(403).send("Error: no se encuentra autorizado para modificar esta información");
@@ -281,6 +326,10 @@ app.delete('/users/:id', authenticateUser, (req, res) => {
             replacements: [req.params.id]
         }).then(deleted_user => {
             res.json(`Eliminado con éxito usuario con id: ${req.params.id}`);
+        }).catch((err)=>{
+            console.log(err);
+            res.status(500);
+            res.render('error', { error: err });
         })
     } else {
         res.status(403).send("Error: no se encuentra autorizado para eliminar este usuario");
@@ -308,7 +357,15 @@ app.post('/products', authorizateUser, (req,res) => {
             replacements: [result[0]], type:sequelize.QueryTypes.SELECT
         }).then(new_product => {
             res.json(new_product);
+        }).catch((err)=>{
+            console.log(err);
+            res.status(500);
+            res.render('error', { error: err });
         })
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500);
+        res.render('error', { error: err });
     })
 })
 
@@ -332,6 +389,10 @@ app.get('/products', authenticateUser, (req,res) => {
         } else {
             res.json(products);
         }
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500);
+        res.render('error', { error: err });
     })
 })
 
@@ -348,6 +409,10 @@ app.get('/products/:id', authenticateUser, (req,res) => {
         } else {
             res.json(product);
         }
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500);
+        res.render('error', { error: err });
     })
 })
 
@@ -385,11 +450,24 @@ app.put('/products/:id', authorizateUser, (req, res) => {
                     replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
                 }).then(updated_product => {
                     res.json(updated_product);
+                }).catch((err)=>{
+                    console.log(err);
+                    res.status(500);
+                    res.render('error', { error: err });
                 })
+            }).catch((err)=>{
+                console.log(err);
+                res.status(500);
+                res.render('error', { error: err });
             })
         }
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500);
+        res.render('error', { error: err });
     })
 })
+
 /* example of info to send in the body:   
 {
     "product_name" : "Agua mineral",
@@ -411,21 +489,14 @@ app.delete('/products/:id', authorizateUser, (req,res) => {
         } else {
             res.json(`Eliminado con éxito producto con id: ${req.params.id}`);
         }
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500);
+        res.render('error', { error: err });
     })
 })
 
 /*---------------------------------------------ORDERS---------------------------------------------*/
-/*let sql = `SELECT username, firstname, lastname, email, adress, phone FROM users WHERE is_admin = 'FALSE'`;
-    sequelize.query( sql, {
-        type:sequelize.QueryTypes.SELECT
-    }).then(all_users => {
-        if (all_users.length === 0) {
-            res.status(404).send(`Error: no existe ningún usuarios`)
-        } else {
-            res.json(all_users);
-        }
-    })*/
-
 /*-----------------ADD AN ORDER-----------------*/
 app.post('/orders', authenticateUser, (req,res) => {
     /*getting all products info to: 
@@ -456,6 +527,10 @@ app.post('/orders', authenticateUser, (req,res) => {
                 if(product_number === product_quantity){
                     insert(products_order, description, total_price);
                 }
+            }).catch((err)=>{
+                console.log(err);
+                res.status(500);
+                res.render('error', { error: err });
             })
         };
     }
@@ -492,6 +567,8 @@ app.post('/orders', authenticateUser, (req,res) => {
                 console.log(result);
             }).catch((err)=>{
                 console.log(err);
+                res.status(500);
+                res.render('error', { error: err });
             })
             products_order.forEach(product => {
                 product["order_id"] = result[0];
@@ -502,11 +579,15 @@ app.post('/orders', authenticateUser, (req,res) => {
                     console.log(result);
                 }).catch((err)=>{
                     console.log(err);
+                    res.status(500);
+                    res.render('error', { error: err });
                 })
             })
             res.status(200).send('Pedido creado');
         }).catch((err)=>{
             console.log(err);
+            res.status(500);
+            res.render('error', { error: err });
         })
     }
 })
@@ -531,6 +612,10 @@ app.get('/orders', authorizateUser, (req, res) => {
         } else {
             res.json(all_orders);
         }
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500);
+        res.render('error', { error: err });
     })
 })
 
@@ -568,13 +653,25 @@ app.get('/orders/:id', authenticateUser, (req, res) => {
                             if (i === (result_order_products.length - 1)) {
                                 send_json(result_order, allproducts);
                             }
+                        }).catch((err)=>{
+                            console.log(err);
+                            res.status(500);
+                            res.render('error', { error: err });
                         })
                     }
+                }).catch((err)=>{
+                    console.log(err);
+                    res.status(500);
+                    res.render('error', { error: err });
                 })
             } else {
                 res.status(403).send("Error: no se encuentra autorizado para ver esta información");
             }
         }
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500);
+        res.render('error', { error: err });
     })
     function send_json (result_order, allproducts){
         result_order.productos = allproducts;
@@ -610,8 +707,16 @@ app.put('/orders/:id', authorizateUser, (req,res) => {
             }).then(order => {
                 console.log(order);
                 res.json((`Cambiado con éxito estado de pedido con id ${req.params.id} a '${changed_order.order_state}'`));
+            }).catch((err)=>{
+                console.log(err);
+                res.status(500);
+                res.render('error', { error: err });
             })
         }
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500);
+        res.render('error', { error: err });
     })
 });
 
@@ -641,8 +746,16 @@ app.delete('/orders/:id', authorizateUser, (req,res) => {
                     res.json(product_result);
                     /*hace falta agregarle que chequee si el usuario al q corresponde lo tiene como ultima orden en cuyo caso borrarsela*/
                 }
+            }).catch((err)=>{
+                console.log(err);
+                res.status(500);
+                res.render('error', { error: err });
             })
         }
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500);
+        res.render('error', { error: err });
     })
 
 })
@@ -667,7 +780,11 @@ app.post('/login', (req,res)=> {
             }, jwtPass);
             res.json({token: token, user_id: user_id});
         }
-    })     
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500);
+        res.render('error', { error: err });
+    })
 })
 
 /*-----------------ROUTES EXAMPLE USING THE EXISTENT MIDDLEWARES(eliminar)-----------------*/
