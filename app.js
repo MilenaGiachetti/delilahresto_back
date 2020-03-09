@@ -7,7 +7,7 @@
 
 let express    = require('express'),
     app        = express(),
-    bodyParser = require('body-parser');
+    bodyParser = require('body-parser'),
     cors       = require('cors'),
     jwt        = require('jsonwebtoken'),
     Sequelize = require('sequelize');
@@ -77,13 +77,16 @@ const authorizateUser = (req, res, next) => {
 /*-----------------SEE ALL USERS(eliminate)-----------------*/
 /*app.get('/users', (req,res) => {
     let sql = `SELECT username, firstname, lastname, email, adress, phone FROM users WHERE is_admin = 'FALSE'`;
-    let query = db.query(sql, (err, result) => {
-        if(err) throw err;
-        console.log(result);
-        res.json(result);
+    sequelize.query( sql, {
+        type:sequelize.QueryTypes.SELECT
+    }).then(all_users => {
+        if (all_users.length === 0) {
+            res.status(404).send(`Error: no existe ningún usuarios`)
+        } else {
+            res.json(all_users);
+        }
     })
 })*/
-
 
 /*-----------------SEE A USER-----------------*/
 app.get('/users/:id', authenticateUser, (req,res) => {
@@ -104,6 +107,173 @@ app.get('/users/:id', authenticateUser, (req,res) => {
     } else {
         res.status(403).send("Error: no se encuentra autorizado a ver esta información");
     }
+})
+
+/*-----------------ADD A USER-----------------*/
+app.post('/users', (req,res) => {
+    let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
+                        FROM users 
+                        WHERE username = ? OR email = ?`;
+    sequelize.query( sql, {
+        replacements: [req.body.username, req.body.email], type:sequelize.QueryTypes.SELECT
+    }).then(repeated_user => {
+        console.log(repeated_user);
+        if (repeated_user.length === 0) {
+            let user = {
+                user_id    : null,
+                username   : req.body.username,
+                firstname  : req.body.firstname,
+                lastname   : req.body.lastname,
+                email      : req.body.email,
+                adress     : req.body.adress,
+                phone      : req.body.phone,
+                password   : req.body.password,
+                last_order : 0,
+                is_admin   : 'FALSE'
+            };
+            let sql = `INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 'FALSE')`;
+            sequelize.query( sql, {
+                replacements: [null,user.username, user.firstname, user.lastname,user.email, user.adress, user.phone, user.password]
+            }).then(result => {
+                console.log(result[0]);
+                /*response with the data of the created user*/
+                let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
+                            FROM users 
+                            WHERE user_id = ?`;
+                sequelize.query( sql, {
+                    replacements: [result[0]], type:sequelize.QueryTypes.SELECT
+                }).then(new_user => {
+                    console.log(new_user);
+                    if (new_user.length === 0) {
+                        res.status(404).send(`Error: no hay usuario con el id ${req.params.id}`)
+                    } else {
+                        /*it should also return the token so it can be already logged in*/
+                        res.json(new_user);
+                    }
+                })
+            })
+        } else {
+            //error handling when there is/are repeated username and/or email
+            let email = 0;
+            let name = 0;
+            repeated_user.forEach(oneUser => {
+                if (oneUser.username === req.body.username && oneUser.email === req.body.email) {
+                    email++;
+                    name++;
+                } else if (oneUser.username === req.body.username) {
+                    name++;
+                } else if (oneUser.email === req.body.email) {
+                    email++;
+                } 
+            });
+            if (email > 0 && name > 0) {
+                res.status(400).send(`Error: ya existe un usuario con este nombre y email`);
+            } else if (name > 0) {
+                res.status(400).send(`Error: ya existe un usuario con este nombre`);
+            } else if (email > 0) {
+                res.status(400).send(`Error: ya existe un usuario con este nombre`);
+            } else {
+                res.status(400).send(`Error: ya existe un usuario con este nombre o email`);
+            }
+        }
+    })
+
+    
+})
+
+/*example of info to send in the body:
+{
+    "username": "LukeSky",
+    "firstname": "Luke",
+    "lastname": "Skywalker",
+    "email": "lukeskywalker@jedi.sw",
+    "adress": "526 Tatooine",
+    "phone": 1545879563,
+    "last_order": 0,
+    "password": "Luke"
+}
+{
+    "username": "Leia",
+    "firstname": "Leia",
+    "lastname": "Organa",
+    "email": "leiaorgana@kindajedi.sw",
+    "adress": "326 Alderaan",
+    "phone": 1512549563,
+    "password": "Leia"
+}
+*/
+
+/*-----------------UPDATE A USER-----------------*/
+app.put('/users/:id', authenticateUser, (req,res) => {
+    if(req.user[0].user_id == req.params.id){
+        /*Search for the current user object*/
+        let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, password 
+                    FROM users 
+                    WHERE user_id = ? AND is_admin = 'FALSE'`;
+        sequelize.query( sql, {
+            replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
+        }).then(result => {
+            if (result.length > 0) {
+                let current_user = result;
+                /*Added conditional in case the request body doesnt send all the users information, in the case of a info not being given it sends the same info that was already in the db*/
+                let changed_user = {
+                    username   : req.body.username  !== undefined ? req.body.username   : current_user[0].username,
+                    firstname  : req.body.firstname  !== undefined ? req.body.firstname  : current_user[0].firstname,
+                    lastname   : req.body.lastname   !== undefined ? req.body.lastname   : current_user[0].lastname,
+                    email      : req.body.email      !== undefined ? req.body.email      : current_user[0].email,
+                    adress     : req.body.adress     !== undefined ? req.body.adress     : current_user[0].adress,
+                    phone      : req.body.phone      !== undefined ? req.body.phone      : current_user[0].phone,
+                    password   : req.body.password   !== undefined ? req.body.password   : current_user[0].password,
+                    last_order : req.body.last_order !== undefined ? req.body.last_order : current_user[0].last_order
+                };
+                let sql =  `UPDATE users SET  (user_id = ?, username = ?, firstname = ?, lastname = ?, email = ?, adress = ?, phone = ?, password = ?, last_order = ?, is_admin = 'FALSE'
+                            WHERE user_id = ?`;
+                sequelize.query( sql, {
+                    replacements: [null, changed_user.username, changed_user.firstname, changed_user.lastname, changed_user.email, changed_user.adress, changed_user.phone, changed_user.password, changed_user.last_order, req.params.id]
+                }).then(result => {
+                    let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
+                    FROM users 
+                    WHERE user_id = ?`;
+                    sequelize.query( sql, {
+                        replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
+                    }).then(new_user => {
+                        console.log(new_user);
+                        if (new_user.length === 0) {
+                            res.status(404).send(`Error: no hay usuario con el id ${req.params.id}`)
+                        } else {
+                            res.json(new_user);
+                        }
+                    })     
+                })           
+            } else {
+                res.send(`Error: no hay usuario con el id ${req.params.id}`)
+            }
+        })
+    } else {
+        res.status(403).send("Error: no se encuentra autorizado para modificar esta información");
+    }
+})
+
+/*---------------------------------------------USER LOG IN---------------------------------------------*/
+app.post('/login', (req,res)=> {
+    let sql =  `SELECT * FROM users 
+                WHERE (username = :username OR email = :email) 
+                AND password = :password`;
+    sequelize.query( sql, {
+        replacements: {username : req.body.username , email: req.body.username,password : req.body.password}, type:sequelize.QueryTypes.SELECT
+    }).then(result => {
+        /*error management*/
+        if(result === undefined  || !(result.length > 0)){
+            res.status(401).send('Error: Usuario inexistente o datos incorrectos');
+        } else{
+            /*token created and sent when correct data is given*/
+            let user_id = result[0].user_id;
+            const token = jwt.sign({
+                user_id,
+            }, jwtPass);
+            res.json({token: token, user_id: user_id});
+        }
+    })     
 })
 
 
