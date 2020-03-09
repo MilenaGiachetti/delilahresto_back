@@ -132,9 +132,10 @@ app.post('/users', (req,res) => {
                 last_order : 0,
                 is_admin   : 'FALSE'
             };
-            let sql = `INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 'FALSE')`;
+            let sql = `INSERT INTO users VALUES (:user_id, :username, :firstname, :lastname, :email, :adress, :phone, :password, :last_order, :is_admin)`;
+            //let sql = `INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 'FALSE')`;
             sequelize.query( sql, {
-                replacements: [null,user.username, user.firstname, user.lastname,user.email, user.adress, user.phone, user.password]
+                replacements: user
             }).then(result => {
                 console.log(result[0]);
                 /*response with the data of the created user*/
