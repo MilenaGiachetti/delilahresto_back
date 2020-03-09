@@ -3,7 +3,8 @@
 /*validar que en creacion de usuarios no se repita mail/usuario ya existente*/
 /*deberian administradores poder eliminar usuarios?*/
 /*ordernar json de ver un pedido*/
-
+/*add al the catchs*/
+/*check that updates dont change elements unique column values to repeated ones*/
 
 let express    = require('express'),
     app        = express(),
@@ -75,7 +76,7 @@ const authorizateUser = (req, res, next) => {
 
 /*---------------------------------------------USERS--------------------------------------------*/
 /*-----------------SEE ALL USERS(eliminate)-----------------*/
-/*app.get('/users', (req,res) => {
+/*app.get('/users', authorizateUser, (req,res) => {
     let sql = `SELECT username, firstname, lastname, email, adress, phone FROM users WHERE is_admin = 'FALSE'`;
     sequelize.query( sql, {
         type:sequelize.QueryTypes.SELECT
@@ -156,6 +157,7 @@ app.post('/users', (req,res) => {
             //error handling when there is/are repeated username and/or email
             let email = 0;
             let name = 0;
+            //checking what is repeated
             repeated_user.forEach(oneUser => {
                 if (oneUser.username === req.body.username && oneUser.email === req.body.email) {
                     email++;
@@ -166,12 +168,13 @@ app.post('/users', (req,res) => {
                     email++;
                 } 
             });
+            //sending error message
             if (email > 0 && name > 0) {
                 res.status(400).send(`Error: ya existe un usuario con este nombre y email`);
             } else if (name > 0) {
                 res.status(400).send(`Error: ya existe un usuario con este nombre`);
             } else if (email > 0) {
-                res.status(400).send(`Error: ya existe un usuario con este nombre`);
+                res.status(400).send(`Error: ya existe un usuario con este email`);
             } else {
                 res.status(400).send(`Error: ya existe un usuario con este nombre o email`);
             }
@@ -204,6 +207,7 @@ app.post('/users', (req,res) => {
 */
 
 /*-----------------UPDATE A USER-----------------*/
+//need to check if email and username doesnt already exists
 app.put('/users/:id', authenticateUser, (req,res) => {
     if(req.user[0].user_id == req.params.id){
         /*Search for the current user object*/
@@ -217,19 +221,20 @@ app.put('/users/:id', authenticateUser, (req,res) => {
                 let current_user = result;
                 /*Added conditional in case the request body doesnt send all the users information, in the case of a info not being given it sends the same info that was already in the db*/
                 let changed_user = {
-                    username   : req.body.username  !== undefined ? req.body.username   : current_user[0].username,
+                    username   : req.body.username   !== undefined ? req.body.username   : current_user[0].username,
                     firstname  : req.body.firstname  !== undefined ? req.body.firstname  : current_user[0].firstname,
                     lastname   : req.body.lastname   !== undefined ? req.body.lastname   : current_user[0].lastname,
                     email      : req.body.email      !== undefined ? req.body.email      : current_user[0].email,
                     adress     : req.body.adress     !== undefined ? req.body.adress     : current_user[0].adress,
                     phone      : req.body.phone      !== undefined ? req.body.phone      : current_user[0].phone,
                     password   : req.body.password   !== undefined ? req.body.password   : current_user[0].password,
-                    last_order : req.body.last_order !== undefined ? req.body.last_order : current_user[0].last_order
+                    last_order : req.body.last_order !== undefined ? req.body.last_order : current_user[0].last_order,
+                    user_id    : req.params.id
                 };
-                let sql =  `UPDATE users SET  (user_id = ?, username = ?, firstname = ?, lastname = ?, email = ?, adress = ?, phone = ?, password = ?, last_order = ?, is_admin = 'FALSE'
-                            WHERE user_id = ?`;
+                let sql =  `UPDATE users SET username = :username, firstname = :firstname, lastname = :lastname, email = :email, adress = :adress, phone = :phone, password = :password, last_order = :last_order, is_admin = 'FALSE'
+                            WHERE user_id = :user_id`;
                 sequelize.query( sql, {
-                    replacements: [null, changed_user.username, changed_user.firstname, changed_user.lastname, changed_user.email, changed_user.adress, changed_user.phone, changed_user.password, changed_user.last_order, req.params.id]
+                    replacements: changed_user
                 }).then(result => {
                     let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
                     FROM users 
@@ -253,6 +258,158 @@ app.put('/users/:id', authenticateUser, (req,res) => {
         res.status(403).send("Error: no se encuentra autorizado para modificar esta información");
     }
 })
+/*example of info to send in the body:
+{
+    "username": "LukeSky",
+    "firstname": "Luke",
+    "adress": "1528 Tatooine",
+    "phone": 1545879563,
+}
+{
+    "email": "leiaorgana@starwars.com",
+}
+*/
+/*-----------------DELETE A USER-----------------*/
+app.delete('/users/:id', authenticateUser, (req, res) => {
+    if(req.user[0].user_id == req.params.id){
+        let sql =  `DELETE FROM users 
+                    WHERE user_id = ?`;
+        sequelize.query( sql, {
+            replacements: [req.params.id]
+        }).then(deleted_user => {
+            res.json(`Eliminado con éxito usuario con id: ${req.params.id}`);
+        })
+    } else {
+        res.status(403).send("Error: no se encuentra autorizado para eliminar este usuario");
+    }
+})
+
+/*---------------------------------------------PRODUCTS---------------------------------------------*/
+/*-----------------ADD A PRODUCT-----------------*/
+app.post('/products', authorizateUser, (req,res) => {
+    let product = {
+        product_name : req.body.product_name,
+        abbreviation : req.body.abbreviation,
+        link_img     : req.body.link_img,
+        price        : req.body.price
+    };
+
+    let sql = 'INSERT INTO products SET product_name = :product_name, abbreviation = :abbreviation, link_img = :link_img, price = :price';
+    sequelize.query( sql, {
+        replacements: product
+    }).then(result => {
+        console.log(result);
+        let sql =  `SELECT * FROM products 
+                    WHERE product_id = ?`;
+        sequelize.query( sql, {
+            replacements: [result[0]], type:sequelize.QueryTypes.SELECT
+        }).then(new_product => {
+            res.json(new_product);
+        })
+    })
+})
+
+/*example of info to send in the body:
+{
+    "product_name":"Hamburguesa Veggie", 
+    "abbreviation":"HamVeg", 
+    "link_img":"https://images.unsplash.com/photo-1540265556701-ae209ac395cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60", 
+    "price":"340"
+}*/
+
+/*-----------------SEE ALL PRODUCTS-----------------*/
+app.get('/products', authenticateUser, (req,res) => {
+    let sql = 'SELECT * FROM products';
+    sequelize.query( sql, {
+        replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
+    }).then(products => {
+        console.log(products);
+        if (products.length === 0) {
+            res.status(404).send("No hay productos en esta base de datos");
+        } else {
+            res.json(products);
+        }
+    })
+})
+
+/*-----------------SEE A PRODUCT-----------------*/
+app.get('/products/:id', authenticateUser, (req,res) => {
+    let sql =  `SELECT * FROM products 
+                WHERE product_id = ?`;
+    sequelize.query( sql, {
+        replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
+    }).then(product => {
+        console.log(product);
+        if (product.length === 0) {
+            res.status(404).send("Producto no existente");
+        } else {
+            res.json(product);
+        }
+    })
+})
+
+/*-----------------UPDATE A PRODUCT-----------------*/
+app.put('/products/:id', authorizateUser, (req, res) => {
+    let sql =  `SELECT * FROM products 
+                WHERE product_id = ?`;
+    sequelize.query( sql, {
+        replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
+    }).then(product => {
+        console.log(product);
+        if (product.length === 0) {
+            res.status(404).send("Producto no existente");
+        } else {
+            let current_product = product;
+            /*Conditional in case not all the info is sent in the body is added*/
+            let changed_product = {
+                product_name : req.body.product_name !== undefined ? req.body.product_name : current_product[0].product_name,
+                abbreviation : req.body.abbreviation !== undefined ? req.body.abbreviation : current_product[0].abbreviation,
+                link_img     : req.body.link_img !== undefined ? req.body.link_img : current_product[0].link_img,
+                price        : req.body.price !== undefined ? req.body.price : current_product[0].price,
+                product_id   : current_product[0].product_id
+
+            };
+            let sql =  `UPDATE products 
+                        SET product_name = :product_name, abbreviation = :abbreviation, link_img = :link_img, price = :price
+                        WHERE product_id = :product_id `;
+
+            sequelize.query( sql, {
+                replacements: changed_product
+            }).then(update_result => {
+                let sql =  `SELECT * FROM products 
+                            WHERE product_id = ?`;
+                sequelize.query( sql, {
+                    replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
+                }).then(updated_product => {
+                    res.json(updated_product);
+                })
+            })
+        }
+    })
+})
+/* example of info to send in the body:   
+{
+    "product_name" : "Agua mineral",
+    "abbreviation" : "Agua",
+    "link_img" : "https://images.unsplash.com/photo-1546498159-9a2fac87e770?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60",
+    "price" : 60
+}
+*/
+
+/*-----------------DELETE A PRODUCT-----------------*/
+app.delete('/products/:id', authorizateUser, (req,res) => {
+    let sql =  `DELETE FROM products 
+                WHERE product_id = ?`;
+    sequelize.query( sql, {
+        replacements: [req.params.id]
+    }).then(product => {
+        if (product[0].affectedRows === 0) {
+            res.status(404).send("Producto no existente");
+        } else {
+            res.json(`Eliminado con éxito producto con id: ${req.params.id}`);
+        }
+    })
+})
 
 /*---------------------------------------------USER LOG IN---------------------------------------------*/
 app.post('/login', (req,res)=> {
@@ -264,10 +421,11 @@ app.post('/login', (req,res)=> {
     }).then(result => {
         /*error management*/
         if(result === undefined  || !(result.length > 0)){
-            res.status(401).send('Error: Usuario inexistente o datos incorrectos');
+            res.status(401).send('Error: Datos incorrectos');
         } else{
             /*token created and sent when correct data is given*/
             let user_id = result[0].user_id;
+            console.log(result);
             const token = jwt.sign({
                 user_id,
             }, jwtPass);
