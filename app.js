@@ -12,6 +12,7 @@ let express    = require('express'),
     cors       = require('cors'),
     jwt        = require('jsonwebtoken'),
     Sequelize = require('sequelize');
+
 /*---------------------------------------------CONNECTION TO DB---------------------------------------------*/
 /*-----------------CREATE CONNECTION TO DB-----------------*/
 const sequelize = new Sequelize('mysql://root:@localhost:3306/delilah_resto2');
@@ -75,41 +76,6 @@ const authorizateUser = (req, res, next) => {
 
 
 /*---------------------------------------------USERS--------------------------------------------*/
-/*-----------------SEE ALL USERS(eliminate)-----------------*/
-/*app.get('/users', authorizateUser, (req,res) => {
-    let sql = `SELECT username, firstname, lastname, email, adress, phone FROM users WHERE is_admin = 'FALSE'`;
-    sequelize.query( sql, {
-        type:sequelize.QueryTypes.SELECT
-    }).then(all_users => {
-        if (all_users.length === 0) {
-            res.status(404).send(`Error: no existe ningún usuarios`)
-        } else {
-            res.json(all_users);
-        }
-    })
-})*/
-
-/*-----------------SEE A USER-----------------*/
-app.get('/users/:id', authenticateUser, (req,res) => {
-    if(req.user[0].user_id == req.params.id || req.user[0].is_admin === 'TRUE'){
-        let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
-                        FROM users 
-                        WHERE user_id = ?`;
-        sequelize.query( sql, {
-            replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
-        }).then(user => {
-            console.log(user);
-            if (user.length === 0) {
-                res.status(404).send(`Error: no hay usuario con el id ${req.params.id}`)
-            } else {
-                res.json(user);
-            }
-        })
-    } else {
-        res.status(403).send("Error: no se encuentra autorizado a ver esta información");
-    }
-})
-
 /*-----------------ADD A USER-----------------*/
 app.post('/users', (req,res) => {
     let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
@@ -206,6 +172,41 @@ app.post('/users', (req,res) => {
 }
 */
 
+/*-----------------SEE ALL USERS(eliminate)-----------------*/
+/*app.get('/users', authorizateUser, (req,res) => {
+    let sql = `SELECT username, firstname, lastname, email, adress, phone FROM users WHERE is_admin = 'FALSE'`;
+    sequelize.query( sql, {
+        type:sequelize.QueryTypes.SELECT
+    }).then(all_users => {
+        if (all_users.length === 0) {
+            res.status(404).send(`Error: no existe ningún usuarios`)
+        } else {
+            res.json(all_users);
+        }
+    })
+})*/
+
+/*-----------------SEE A USER-----------------*/
+app.get('/users/:id', authenticateUser, (req,res) => {
+    if(req.user[0].user_id == req.params.id || req.user[0].is_admin === 'TRUE'){
+        let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
+                        FROM users 
+                        WHERE user_id = ?`;
+        sequelize.query( sql, {
+            replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
+        }).then(user => {
+            console.log(user);
+            if (user.length === 0) {
+                res.status(404).send(`Error: no hay usuario con el id ${req.params.id}`)
+            } else {
+                res.json(user);
+            }
+        })
+    } else {
+        res.status(403).send("Error: no se encuentra autorizado a ver esta información");
+    }
+})
+
 /*-----------------UPDATE A USER-----------------*/
 //need to check if email and username doesnt already exists
 app.put('/users/:id', authenticateUser, (req,res) => {
@@ -258,6 +259,7 @@ app.put('/users/:id', authenticateUser, (req,res) => {
         res.status(403).send("Error: no se encuentra autorizado para modificar esta información");
     }
 })
+
 /*example of info to send in the body:
 {
     "username": "LukeSky",
@@ -269,6 +271,7 @@ app.put('/users/:id', authenticateUser, (req,res) => {
     "email": "leiaorgana@starwars.com",
 }
 */
+
 /*-----------------DELETE A USER-----------------*/
 app.delete('/users/:id', authenticateUser, (req, res) => {
     if(req.user[0].user_id == req.params.id){
@@ -667,15 +670,13 @@ app.post('/login', (req,res)=> {
     })     
 })
 
-
-
 /*-----------------ROUTES EXAMPLE USING THE EXISTENT MIDDLEWARES(eliminar)-----------------*/
-app.get('/secure', authenticateUser, (req, res)=> {
+/*app.get('/secure', authenticateUser, (req, res)=> {
     res.send(`Esta es una pagina autenticada. Hola ${req.user[0].firstname}!`);
 })
 app.get('/adminonly', authorizateUser, (req, res)=> {
     res.send(`Esta es una pagina que requiere autorizacion. Hola Admin!`);
-})
+})*/
 
 
 /*---------------------------------------------LISTENER CREATED IN PORT 3000--------------------------------------------*/
