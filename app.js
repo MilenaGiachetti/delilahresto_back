@@ -7,7 +7,11 @@
 
 /*deberian administradores poder eliminar usuarios?*/
 
+/*Validar existencia de productos al crear un pedido*/
+
 /*ordernar json de ver un pedido*/
+
+/*cambiar get de pedidos para que te info tmbn de productos como lo hace el get de un pedido*/ 
 
 /*pensar mejor el contenido de los catchs*/
 
@@ -610,13 +614,63 @@ app.get('/orders', authorizateUser, (req, res) => {
         if (all_orders.length === 0) {
             res.status(404).send(`Error: no hay ningún pedido en la base de datos`);
         } else {
-            res.json(all_orders);
+            let orders = [];
+            for(let i = 0; i < all_orders.length; i++){
+                let current_order = {};
+                current_order.pedido = all_orders[i];
+                function save_products (allproducts) {
+                    current_order.pedido.productos = allproducts;
+                    orders.push(current_order);
+                }
+                let sql =  `SELECT * FROM products_orders 
+                            WHERE order_id = ?`;
+                sequelize.query( sql, {
+                    replacements: [all_orders[i].order_id], type:sequelize.QueryTypes.SELECT
+                }).then(result_order_products => {
+                    console.log(result_order_products)
+                    let allproducts = [];
+                    for(let h = 0; h < result_order_products.length; h++){
+                        let sql =  `SELECT * FROM products 
+                                    WHERE product_id = ?`;
+                        sequelize.query( sql, {
+                            replacements: [result_order_products[h].product_id], type:sequelize.QueryTypes.SELECT
+                        }).then(result_product => {
+                            allproducts.push({
+                                "quantity"     : result_order_products[h].product_quantity,
+                                "product_id"   : result_product[0].product_id,
+                                "product_name" : result_product[0].product_name,
+                                "abbreviation" : result_product[0].abbreviation,
+                                "link_img"     : result_product[0].link_img,
+                                "price"        : result_product[0].price
+                            });
+                            if (h === (result_order_products.length - 1)) {
+                                save_products(allproducts);
+                            }
+                            if (i === (all_orders.length - 1)) {
+                                send_json(orders);
+                            }
+                        }).catch((err)=>{
+                            console.log(err);
+                            res.status(500);
+                            res.render('error', { error: err });
+                        })
+                    }
+                }).catch((err)=>{
+                    console.log(err);
+                    res.status(500);
+                    res.render('error', { error: err });
+                })
+            };
         }
     }).catch((err)=>{
         console.log(err);
         res.status(500);
         res.render('error', { error: err });
     })
+    function send_json (orders){
+        console.log(orders);
+        res.json({'pedidos': orders});
+    }
 })
 
 /*-----------------SEE A ORDER-----------------*/
@@ -626,6 +680,8 @@ app.get('/orders/:id', authenticateUser, (req, res) => {
     sequelize.query( sql, {
         replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(result_order => {
+        order = {};
+        order.pedido = result_order[0];
         if (result_order.length === 0) {
             res.status(404).send("Pedido no existente");
         } else {
@@ -651,7 +707,7 @@ app.get('/orders/:id', authenticateUser, (req, res) => {
                                 "price"        : result_product[0].price
                             });
                             if (i === (result_order_products.length - 1)) {
-                                send_json(result_order, allproducts);
+                                send_json(order, allproducts);
                             }
                         }).catch((err)=>{
                             console.log(err);
@@ -673,11 +729,10 @@ app.get('/orders/:id', authenticateUser, (req, res) => {
         res.status(500);
         res.render('error', { error: err });
     })
-    function send_json (result_order, allproducts){
-        result_order.productos = allproducts;
-        json = result_order.result_order;
-        console.log(result_order);
-        res.json({"pedido" : result_order, "productos" : allproducts});
+    function send_json (order, allproducts){
+        order.pedido.productos = allproducts;
+        console.log(order);
+        res.json(order);
     }
 })
 
