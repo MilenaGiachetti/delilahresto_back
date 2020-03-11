@@ -560,7 +560,10 @@ app.post('/orders', authenticateUser, (req,res) => {
 
 /*-----------------SEE ALL ORDERS-----------------*/
 app.get('/orders', authorizateUser, (req, res) => {
-    let sql = 'SELECT * FROM orders';
+    let sql =  `SELECT *
+                FROM orders 
+                INNER JOIN products_orders ON products_orders.order_id = orders.order_id 
+                INNER JOIN products ON products_orders.product_id = products.product_id`;
     sequelize.query( sql, {
         type:sequelize.QueryTypes.SELECT
     }).then(all_orders => {
@@ -568,76 +571,68 @@ app.get('/orders', authorizateUser, (req, res) => {
             res.status(404).send(`Error: no hay ningún pedido en la base de datos`);
         } else {
             let orders = [];
-            for(let i = 0; i < all_orders.length; i++){
-                let current_order = {};
-                current_order.pedido = all_orders[i];
-                function save_products (allproducts) {
-                    current_order.pedido.productos = allproducts;
-                    orders.push(current_order);
+            let order;
+            let product;
+            function createProduct (i) {
+                product = {
+                    product_quantity: all_orders[i].product_quantity,
+                    product_id: all_orders[i].product_id,
+                    product_name: all_orders[i].product_name,
+                    abbreviation: all_orders[i].abbreviation,
+                    link_img: all_orders[i].link_img,
+                    price:  all_orders[i].price
                 }
-                let sql =  `SELECT * FROM products_orders 
-                            WHERE order_id = ?`;
-                sequelize.query( sql, {
-                    replacements: [all_orders[i].order_id], type:sequelize.QueryTypes.SELECT
-                }).then(result_order_products => {
-                    console.log(result_order_products)
-                    let allproducts = [];
-                    for(let h = 0; h < result_order_products.length; h++){
-                        let sql =  `SELECT * FROM products 
-                                    WHERE product_id = ?`;
-                        sequelize.query( sql, {
-                            replacements: [result_order_products[h].product_id], type:sequelize.QueryTypes.SELECT
-                        }).then(result_product => {
-                            allproducts.push({
-                                "quantity"     : result_order_products[h].product_quantity,
-                                "product_id"   : result_product[0].product_id,
-                                "product_name" : result_product[0].product_name,
-                                "abbreviation" : result_product[0].abbreviation,
-                                "link_img"     : result_product[0].link_img,
-                                "price"        : result_product[0].price
-                            });
-                            if (h === (result_order_products.length - 1)) {
-                                save_products(allproducts);
-                            }
-                            if (i === (all_orders.length - 1)) {
-                                send_json(orders);
-                            }
-                        }).catch((err)=>{
-                            console.log(err);
-                            res.status(500);
-                            res.render('error', { error: err });
-                        })
+            }
+            function createOrder (i) {
+                order = {
+                    order_id: all_orders[i].order_id,
+                    description: all_orders[i].description,
+                    payment: all_orders[i].payment,
+                    order_state: all_orders[i].order_state,
+                    date: all_orders[i].date,
+                    hour: all_orders[i].hour,
+                    total_price: all_orders[i].total_price,
+                    user_id: all_orders[i].user_id,
+                    products: []
+                }
+            }
+            for (let i = 0; i < all_orders.length; i++){
+                if (i === 0 || all_orders[i].order_id !== all_orders[i - 1].order_id){
+                    createOrder(i);
+                    createProduct(i);
+                    order.products.push(product);
+                    if (i === (all_orders.length - 1) || all_orders[i].order_id !== all_orders[i + 1].order_id) {
+                        orders.push(order);
                     }
-                }).catch((err)=>{
-                    console.log(err);
-                    res.status(500);
-                    res.render('error', { error: err });
-                })
-            };
+                } else if (all_orders[i].order_id !== all_orders[i + 1].order_id) { 
+                    createProduct(i);
+                    order.products.push(product);
+                    orders.push(order);
+                } else {
+                    createProduct(i);
+                    order.products.push(product);
+                }
+            }
+            console.log(all_orders);
+            res.json(orders);
         }
     }).catch((err)=>{
         console.log(err);
         res.status(500);
         res.render('error', { error: err });
     })
-    function send_json (orders){
-        console.log(orders);
-        res.json({'pedidos': orders});
-    }
 })
 
 /*-----------------SEE A ORDER-----------------*/
 app.get('/orders/:id', authenticateUser, (req, res) => {
     let sql =  `SELECT *
                 FROM orders 
-                INNER JOIN products_orders ON products_orders.order_id = ?
+                INNER JOIN products_orders ON products_orders.order_id = orders.order_id 
                 INNER JOIN products ON products_orders.product_id = products.product_id 
                 WHERE orders.order_id = ?`;
     sequelize.query( sql, {
-        replacements: [req.params.id, req.params.id], type:sequelize.QueryTypes.SELECT
+        replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(result_order => {
-        order = {};
-        order.pedido = result_order[0];
         if (result_order.length === 0) {
             res.status(404).send("Pedido no existente");
         } else {
