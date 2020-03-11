@@ -412,17 +412,6 @@ app.put('/products/:id', authorizateUser, (req, res) => {
                 replacements: changed_product
             }).then(update_result => {
                 res.json(changed_product);
-
-                /*let sql =  `SELECT * FROM products 
-                            WHERE product_id = ?`;
-                sequelize.query( sql, {
-                    replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
-                }).then(updated_product => {
-                }).catch((err)=>{
-                    console.log(err);
-                    res.status(500);
-                    res.render('error', { error: err });
-                })*/
             }).catch((err)=>{
                 console.log(err);
                 res.status(500);
@@ -639,10 +628,13 @@ app.get('/orders', authorizateUser, (req, res) => {
 
 /*-----------------SEE A ORDER-----------------*/
 app.get('/orders/:id', authenticateUser, (req, res) => {
-    let sql =  `SELECT * FROM orders 
-                WHERE order_id = ?`;
+    let sql =  `SELECT *
+                FROM orders 
+                INNER JOIN products_orders ON products_orders.order_id = ?
+                INNER JOIN products ON products_orders.product_id = products.product_id 
+                WHERE orders.order_id = ?`;
     sequelize.query( sql, {
-        replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
+        replacements: [req.params.id, req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(result_order => {
         order = {};
         order.pedido = result_order[0];
@@ -650,40 +642,30 @@ app.get('/orders/:id', authenticateUser, (req, res) => {
             res.status(404).send("Pedido no existente");
         } else {
             if(req.user[0].user_id === result_order[0].user_id || req.user[0].is_admin === 'TRUE'){
-                let sql =  `SELECT * FROM products_orders 
-                WHERE order_id = ?`;
-                sequelize.query( sql, {
-                    replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
-                }).then(result_order_products => {
-                    let allproducts = [];
-                    for(let i = 0; i < result_order_products.length; i++){
-                        let sql =  `SELECT * FROM products 
-                                    WHERE product_id = ?`;
-                        sequelize.query( sql, {
-                            replacements: [result_order_products[i].product_id], type:sequelize.QueryTypes.SELECT
-                        }).then(result_product => {
-                            allproducts.push({
-                                "quantity"     : result_order_products[i].product_quantity,
-                                "product_id"   : result_product[0].product_id,
-                                "product_name" : result_product[0].product_name,
-                                "abbreviation" : result_product[0].abbreviation,
-                                "link_img"     : result_product[0].link_img,
-                                "price"        : result_product[0].price
-                            });
-                            if (i === (result_order_products.length - 1)) {
-                                send_json(order, allproducts);
-                            }
-                        }).catch((err)=>{
-                            console.log(err);
-                            res.status(500);
-                            res.render('error', { error: err });
-                        })
+                let order = {
+                    order_id: result_order[0].order_id,
+                    description: result_order[0].description,
+                    payment: result_order[0].payment,
+                    order_state: result_order[0].order_state,
+                    date: result_order[0].date,
+                    hour: result_order[0].hour,
+                    total_price: result_order[0].total_price,
+                    user_id: result_order[0].user_id,
+                    products: []
+                }
+                for(let i = 0; i < result_order.length; i++){
+                    let product = {
+                        product_quantity: result_order[i].product_quantity,
+                        product_id: result_order[i].product_id,
+                        product_name: result_order[i].product_name,
+                        abbreviation: result_order[i].abbreviation,
+                        link_img: result_order[i].link_img,
+                        price:  result_order[i].price
                     }
-                }).catch((err)=>{
-                    console.log(err);
-                    res.status(500);
-                    res.render('error', { error: err });
-                })
+                    order.products.push(product);
+                }
+                console.log(order);
+                res.json(order);
             } else {
                 res.status(403).send("Error: no se encuentra autorizado para ver esta información");
             }
@@ -693,11 +675,6 @@ app.get('/orders/:id', authenticateUser, (req, res) => {
         res.status(500);
         res.render('error', { error: err });
     })
-    function send_json (order, allproducts){
-        order.pedido.productos = allproducts;
-        console.log(order);
-        res.json(order);
-    }
 })
 
 /*-----------------UPDATE A ORDER-----------------*/
