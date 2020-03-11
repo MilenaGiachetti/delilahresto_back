@@ -2,7 +2,7 @@
   "name": "proyecto3.2",
   "version": "1.0.0",
   "description": "Tercer proyecto para el curso de Desarrollo Web Full Stack de Acamica",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
