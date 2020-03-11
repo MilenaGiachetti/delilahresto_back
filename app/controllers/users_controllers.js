@@ -10,7 +10,6 @@ exports.addOne = (req,res) => {
     db.sequelize.query( sql, {
         replacements: [req.body.username, req.body.email], type:sequelize.QueryTypes.SELECT
     }).then(repeated_user => {
-        console.log(repeated_user);
         if (repeated_user.length === 0) {
             let user = {
                 user_id    : null,
@@ -28,13 +27,11 @@ exports.addOne = (req,res) => {
             db.sequelize.query( sql, {
                 replacements: user
             }).then(result => {
-                console.log(result[0]);
                 user.user_id = result[0];
                 delete user.password;
                 res.json(user);
                 /*it should also return the token so it can be already logged in ?*/
             }).catch((err)=>{
-                console.log(err);
                 res.status(500);
                 res.render('error', { error: err });
             })
@@ -65,7 +62,6 @@ exports.addOne = (req,res) => {
             }
         }
     }).catch((err)=>{
-        console.log(err);
         res.status(500);
         res.render('error', { error: err });
     })
@@ -83,7 +79,6 @@ exports.addOne = (req,res) => {
             res.json(all_users);
         }
     }).catch((err)=>{
-        console.log(err);
         res.status(500);
         res.render('error', { error: err });
     })
@@ -98,14 +93,12 @@ exports.findOne = (req, res) => {
         db.sequelize.query( sql, {
             replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
         }).then(user => {
-            console.log(user);
             if (user.length === 0) {
                 res.status(404).send(`Error: no hay usuario con el id ${req.params.id}`)
             } else {
                 res.json(user[0]);
             }
         }).catch((err)=>{
-            console.log(err);
             res.status(500);
             res.render('error', { error: err });
         })
@@ -147,7 +140,6 @@ exports.updateOne = (req,res) => {
                     delete changed_user.password;
                     res.json(changed_user);
                 }).catch((err)=>{
-                    console.log(err);
                     res.status(500);
                     res.render('error', { error: err });
                 })           
@@ -155,7 +147,6 @@ exports.updateOne = (req,res) => {
                 res.send(`Error: no hay usuario con el id ${req.params.id}`)
             }
         }).catch((err)=>{
-            console.log(err);
             res.status(500);
             res.render('error', { error: err });
         })
@@ -174,7 +165,6 @@ exports.deleteOne = (req, res) => {
         }).then(deleted_user => {
             res.json(`Eliminado con éxito usuario con id: ${req.params.id}`);
         }).catch((err)=>{
-            console.log(err);
             res.status(500);
             res.render('error', { error: err });
         })

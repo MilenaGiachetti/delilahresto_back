@@ -21,7 +21,6 @@ exports.addOne = (req,res) => {
         new_product.product_id = result[0].insertId;
         res.json(new_product);
     }).catch((err)=>{
-        console.log(err);
         res.status(500);
         res.render('error', { error: err });
     })
@@ -33,14 +32,12 @@ exports.findAll = (req,res) => {
     db.sequelize.query( sql, {
         replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(products => {
-        console.log(products);
         if (products.length === 0) {
             res.status(404).send("No hay productos en esta base de datos");
         } else {
             res.json(products);
         }
     }).catch((err)=>{
-        console.log(err);
         res.status(500);
         res.render('error', { error: err });
     })
@@ -53,14 +50,12 @@ exports.findOne = (req, res) => {
     db.sequelize.query( sql, {
         replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(product => {
-        console.log(product);
         if (product.length === 0) {
             res.status(404).send("Producto no existente");
         } else {
             res.json(product);
         }
     }).catch((err)=>{
-        console.log(err);
         res.status(500);
         res.render('error', { error: err });
     })
@@ -73,7 +68,6 @@ exports.updateOne = (req, res) => {
     db.sequelize.query( sql, {
         replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(product => {
-        console.log(product);
         if (product.length === 0) {
             res.status(404).send("Producto no existente");
         } else {
@@ -95,13 +89,11 @@ exports.updateOne = (req, res) => {
             }).then(update_result => {
                 res.json(changed_product);
             }).catch((err)=>{
-                console.log(err);
                 res.status(500);
                 res.render('error', { error: err });
             })
         }
     }).catch((err)=>{
-        console.log(err);
         res.status(500);
         res.render('error', { error: err });
     })
@@ -120,7 +112,6 @@ exports.deleteOne = (req,res) => {
             res.json(`Eliminado con éxito producto con id: ${req.params.id}`);
         }
     }).catch((err)=>{
-        console.log(err);
         res.status(500);
         res.render('error', { error: err });
     })

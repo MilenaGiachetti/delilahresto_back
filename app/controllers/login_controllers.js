@@ -17,14 +17,12 @@ exports.login = (req,res) => {
         } else{
             /*token created and sent when correct data is given*/
             let user_id = result[0].user_id;
-            console.log(result);
             const token = reqs.jwt.sign({
                 user_id,
             }, jwtPass);
             res.json({token: token, user_id: user_id});
         }
     }).catch((err)=>{
-        console.log(err);
         res.status(500);
         res.render('error', { error: err });
     })

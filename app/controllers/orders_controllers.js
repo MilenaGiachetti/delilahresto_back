@@ -33,7 +33,6 @@ exports.addOne = (req,res) => {
                     insert(products_order, description, total_price);
                 }
             }).catch((err)=>{
-                console.log(err);
                 res.status(500);
                 res.render('error', { error: err });
             })
@@ -69,28 +68,22 @@ exports.addOne = (req,res) => {
             db.sequelize.query( sql, {
                 replacements: changed_user
             }).then((result) => {
-                console.log(result);
+                products_order.forEach(product => {
+                    product["order_id"] = result[0];
+                    let sql = `INSERT INTO products_orders SET order_id= :order_id, product_id = :product_id, product_quantity = :product_quantity, user_id = :user_id`;
+                    sequelize.query( sql, {
+                        replacements: product
+                    }).catch((err)=>{
+                        res.status(500);
+                        res.render('error', { error: err });
+                    })
+                })
+                res.status(200).send('Pedido creado');
             }).catch((err)=>{
-                console.log(err);
                 res.status(500);
                 res.render('error', { error: err });
             })
-            products_order.forEach(product => {
-                product["order_id"] = result[0];
-                let sql = `INSERT INTO products_orders SET order_id= :order_id, product_id = :product_id, product_quantity = :product_quantity, user_id = :user_id`;
-                sequelize.query( sql, {
-                    replacements: product
-                }).then((result)=>{
-                    console.log(result);
-                }).catch((err)=>{
-                    console.log(err);
-                    res.status(500);
-                    res.render('error', { error: err });
-                })
-            })
-            res.status(200).send('Pedido creado');
         }).catch((err)=>{
-            console.log(err);
             res.status(500);
             res.render('error', { error: err });
         })
@@ -155,7 +148,6 @@ exports.findAll = (req, res) => {
             res.json(orders);
         }
     }).catch((err)=>{
-        console.log(err);
         res.status(500);
         res.render('error', { error: err });
     })
@@ -197,14 +189,12 @@ exports.findOne = (req, res) => {
                     }
                     order.products.push(product);
                 }
-                console.log(order);
                 res.json(order);
             } else {
                 res.status(403).send("Error: no se encuentra autorizado para ver esta información");
             }
         }
     }).catch((err)=>{
-        console.log(err);
         res.status(500);
         res.render('error', { error: err });
     })
@@ -234,16 +224,13 @@ exports.updateOne = (req,res) => {
             db.sequelize.query( sql, {
                 replacements: changed_order
             }).then(order => {
-                console.log(order);
                 res.json((`Cambiado con éxito estado de pedido con id ${req.params.id} a '${changed_order.order_state}'`));
             }).catch((err)=>{
-                console.log(err);
                 res.status(500);
                 res.render('error', { error: err });
             })
         }
     }).catch((err)=>{
-        console.log(err);
         res.status(500);
         res.render('error', { error: err });
     })
@@ -271,13 +258,11 @@ exports.deleteOne = (req,res) => {
                     /*hace falta agregarle que chequee si el usuario al q corresponde lo tiene como ultima orden en cuyo caso borrarsela*/
                 }
             }).catch((err)=>{
-                console.log(err);
                 res.status(500);
                 res.render('error', { error: err });
             })
         }
     }).catch((err)=>{
-        console.log(err);
         res.status(500);
         res.render('error', { error: err });
     })
