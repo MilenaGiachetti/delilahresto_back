@@ -613,7 +613,6 @@ app.get('/orders', authorizateUser, (req, res) => {
                     order.products.push(product);
                 }
             }
-            console.log(all_orders);
             res.json(orders);
         }
     }).catch((err)=>{
