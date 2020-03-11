@@ -2,3 +2,4 @@ node_modules
 *.txt
 *.sass
 *.css.map
+package-lock.json
