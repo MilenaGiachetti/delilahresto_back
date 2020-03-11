@@ -1,18 +1,8 @@
-let express    = require('express'),
-    app        = express(),
-    bodyParser = require('body-parser'),
-    cors       = require('cors'),
-    jwt        = require('jsonwebtoken'),
-    Sequelize = require('sequelize');
+/*---------------------------------------------REQUIREMENTS--------------------------------------------*/
+const db = require('../config/db_config');
 
-/*---------------------------------------------CONNECTION TO DB---------------------------------------------*/
-/*-----------------CREATE CONNECTION TO DB-----------------*/
-const sequelize = new Sequelize('mysql://root:@localhost:3306/delilah_resto2');
-
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
+/*---------------------------------------------PRODUCTS--------------------------------------------*/
+/*-----------------ADD A PRODUCT-----------------*/
 exports.addOne = (req,res) => {
     let new_product = {
         product_name : req.body.product_name,
@@ -25,7 +15,7 @@ exports.addOne = (req,res) => {
                             abbreviation = :abbreviation, 
                             link_img     = :link_img, 
                             price        = :price`;
-    sequelize.query( sql, {
+    db.sequelize.query( sql, {
         replacements: new_product
     }).then(result => {
         new_product.product_id = result[0].insertId;
@@ -37,9 +27,10 @@ exports.addOne = (req,res) => {
     })
 }
 
+/*-----------------SEE ALL PRODUCTS-----------------*/
 exports.findAll = (req,res) => {
     let sql = 'SELECT * FROM products';
-    sequelize.query( sql, {
+    db.sequelize.query( sql, {
         replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(products => {
         console.log(products);
@@ -55,10 +46,11 @@ exports.findAll = (req,res) => {
     })
 }
 
+/*-----------------SEE A PRODUCT-----------------*/
 exports.findOne = (req, res) => {
     let sql =  `SELECT * FROM products 
                 WHERE product_id = ?`;
-    sequelize.query( sql, {
+    db.sequelize.query( sql, {
         replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(product => {
         console.log(product);
@@ -74,10 +66,11 @@ exports.findOne = (req, res) => {
     })
 }
 
+/*-----------------UPDATE A PRODUCT-----------------*/
 exports.updateOne = (req, res) => {
     let sql =  `SELECT * FROM products 
                 WHERE product_id = ?`;
-    sequelize.query( sql, {
+    db.sequelize.query( sql, {
         replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(product => {
         console.log(product);
@@ -97,7 +90,7 @@ exports.updateOne = (req, res) => {
                         SET product_name = :product_name, abbreviation = :abbreviation, link_img = :link_img, price = :price
                         WHERE product_id = :product_id `;
 
-            sequelize.query( sql, {
+            db.sequelize.query( sql, {
                 replacements: changed_product
             }).then(update_result => {
                 res.json(changed_product);
@@ -114,10 +107,11 @@ exports.updateOne = (req, res) => {
     })
 }
 
+/*-----------------DELETE A PRODUCT-----------------*/
 exports.deleteOne = (req,res) => {
     let sql =  `DELETE FROM products 
                 WHERE product_id = ?`;
-    sequelize.query( sql, {
+    db.sequelize.query( sql, {
         replacements: [req.params.id]
     }).then(product => {
         if (product[0].affectedRows === 0) {

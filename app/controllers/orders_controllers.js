@@ -1,19 +1,8 @@
+/*---------------------------------------------REQUIREMENTS--------------------------------------------*/
+const db = require('../config/db_config');
 
-let express    = require('express'),
-app        = express(),
-bodyParser = require('body-parser'),
-cors       = require('cors'),
-jwt        = require('jsonwebtoken'),
-Sequelize = require('sequelize');
-
-/*---------------------------------------------CONNECTION TO DB---------------------------------------------*/
-/*-----------------CREATE CONNECTION TO DB-----------------*/
-const sequelize = new Sequelize('mysql://root:@localhost:3306/delilah_resto2');
-
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
+/*---------------------------------------------ORDERS--------------------------------------------*/
+/*-----------------ADD A ORDER-----------------*/
 exports.addOne = (req,res) => {
     /*getting all products info to: 
     -make the order description
@@ -28,7 +17,7 @@ exports.addOne = (req,res) => {
         let product_number = 0;
         for(let id in req.body.products){
             let sql = `SELECT * FROM products WHERE product_id = ?`;
-            await sequelize.query( sql, {
+            await db.sequelize.query( sql, {
                 replacements: [id], type:sequelize.QueryTypes.SELECT
             }).then(result => {
                 product_number += 1;
@@ -60,7 +49,7 @@ exports.addOne = (req,res) => {
             user_id     : req.user[0].user_id
         };
         let sql = 'INSERT INTO orders SET description = :description, payment = :payment, order_state = :order_state, total_price= :total_price, user_id = :user_id';
-        sequelize.query( sql, {
+        db.sequelize.query( sql, {
             replacements: order
         }).then(result => {
             let changed_user = {
@@ -77,7 +66,7 @@ exports.addOne = (req,res) => {
             };
             let sql =  `UPDATE users SET user_id = :user_id, username = :username, firstname = :firstname, lastname = :lastname, email = :email, adress = :adress, phone = :phone, password = :password, last_order = :last_order, is_admin = :is_admin
                         WHERE user_id = :user_id`;
-            sequelize.query( sql, {
+            db.sequelize.query( sql, {
                 replacements: changed_user
             }).then((result) => {
                 console.log(result);
@@ -108,12 +97,13 @@ exports.addOne = (req,res) => {
     }
 }
 
+/*-----------------SEE ALL ORDERS-----------------*/
 exports.findAll = (req, res) => {
     let sql =  `SELECT *
                 FROM orders 
                 INNER JOIN products_orders ON products_orders.order_id = orders.order_id 
                 INNER JOIN products ON products_orders.product_id = products.product_id`;
-    sequelize.query( sql, {
+    db.sequelize.query( sql, {
         type:sequelize.QueryTypes.SELECT
     }).then(all_orders => {
         if (all_orders.length === 0) {
@@ -171,13 +161,14 @@ exports.findAll = (req, res) => {
     })
 }
 
+/*-----------------SEE A ORDER-----------------*/
 exports.findOne = (req, res) => {
     let sql =  `SELECT *
                 FROM orders 
                 INNER JOIN products_orders ON products_orders.order_id = orders.order_id 
                 INNER JOIN products ON products_orders.product_id = products.product_id 
                 WHERE orders.order_id = ?`;
-    sequelize.query( sql, {
+    db.sequelize.query( sql, {
         replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(result_order => {
         if (result_order.length === 0) {
@@ -219,10 +210,11 @@ exports.findOne = (req, res) => {
     })
 }
 
+/*-----------------UPDATE A ORDER-----------------*/
 exports.updateOne = (req,res) => {
     let sql =  `SELECT * FROM orders 
                 WHERE order_id = ?`;
-    sequelize.query( sql, {
+    db.sequelize.query( sql, {
         replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(current_order => {
         if (current_order.length === 0) {
@@ -239,7 +231,7 @@ exports.updateOne = (req,res) => {
             let sql =  `UPDATE orders 
                         SET  description = :description, payment = :payment, order_state = :order_state, total_price= :total_price, user_id = :user_id
                         WHERE order_id = :order_id`;
-            sequelize.query( sql, {
+            db.sequelize.query( sql, {
                 replacements: changed_order
             }).then(order => {
                 console.log(order);
@@ -257,10 +249,11 @@ exports.updateOne = (req,res) => {
     })
 }
 
+/*-----------------DELETE A ORDER-----------------*/
 exports.deleteOne = (req,res) => {
     let sql =  `DELETE FROM orders
                 WHERE order_id = ?`;
-    sequelize.query( sql, {
+    db.sequelize.query( sql, {
         replacements: [req.params.id]
     }).then((order_result) => {
         if (order_result[0].affectedRows === 0) {
@@ -268,7 +261,7 @@ exports.deleteOne = (req,res) => {
         } else {
             let sql =  `DELETE FROM products_orders
                 WHERE order_id = ?`;
-            sequelize.query( sql, {
+            db.sequelize.query( sql, {
                 replacements: [req.params.id]
             }).then((product_result) => {
                 if (product_result[0].affectedRows === 0) {

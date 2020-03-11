@@ -1,23 +1,13 @@
-let express    = require('express'),
-    app        = express(),
-    bodyParser = require('body-parser'),
-    cors       = require('cors'),
-    jwt        = require('jsonwebtoken'),
-    Sequelize = require('sequelize');
+/*---------------------------------------------REQUIREMENTS--------------------------------------------*/
+const db = require('../config/db_config');
 
-/*---------------------------------------------CONNECTION TO DB---------------------------------------------*/
-/*-----------------CREATE CONNECTION TO DB-----------------*/
-const sequelize = new Sequelize('mysql://root:@localhost:3306/delilah_resto2');
-
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
+/*---------------------------------------------USERS--------------------------------------------*/
+/*-----------------ADD A USER-----------------*/
 exports.addOne = (req,res) => {
     let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
                         FROM users 
                         WHERE username = ? OR email = ?`;
-    sequelize.query( sql, {
+    db.sequelize.query( sql, {
         replacements: [req.body.username, req.body.email], type:sequelize.QueryTypes.SELECT
     }).then(repeated_user => {
         console.log(repeated_user);
@@ -35,7 +25,7 @@ exports.addOne = (req,res) => {
                 is_admin   : 'FALSE'
             };
             let sql = `INSERT INTO users VALUES (:user_id, :username, :firstname, :lastname, :email, :adress, :phone, :password, :last_order, :is_admin)`;
-            sequelize.query( sql, {
+            db.sequelize.query( sql, {
                 replacements: user
             }).then(result => {
                 console.log(result[0]);
@@ -81,9 +71,10 @@ exports.addOne = (req,res) => {
     })
 }
 
+/*-----------------SEE ALL USERS-----------------*/
 /*exports.findAll = (req,res) => {
     let sql = `SELECT username, firstname, lastname, email, adress, phone FROM users WHERE is_admin = 'FALSE'`;
-    sequelize.query( sql, {
+    db.sequelize.query( sql, {
         type:sequelize.QueryTypes.SELECT
     }).then(all_users => {
         if (all_users.length === 0) {
@@ -98,12 +89,13 @@ exports.addOne = (req,res) => {
     })
 }*/
 
+/*-----------------SEE A USER-----------------*/
 exports.findOne = (req, res) => {
     if(req.user[0].user_id == req.params.id || req.user[0].is_admin === 'TRUE'){
         let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
                         FROM users 
                         WHERE user_id = ?`;
-        sequelize.query( sql, {
+        db.sequelize.query( sql, {
             replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
         }).then(user => {
             console.log(user);
@@ -122,13 +114,14 @@ exports.findOne = (req, res) => {
     }
 }
 
+/*-----------------UPDATE A USER-----------------*/
 exports.updateOne = (req,res) => {
     if(req.user[0].user_id == req.params.id){
         /*Search for the current user object*/
         let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, password, is_admin
                     FROM users 
                     WHERE user_id = ?`;
-        sequelize.query( sql, {
+        db.sequelize.query( sql, {
             replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
         }).then(result => {
             if (result.length > 0) {
@@ -148,7 +141,7 @@ exports.updateOne = (req,res) => {
                 };
                 let sql =  `UPDATE users SET username = :username, firstname = :firstname, lastname = :lastname, email = :email, adress = :adress, phone = :phone, password = :password, last_order = :last_order, is_admin = :is_admin
                             WHERE user_id = :user_id`;
-                sequelize.query( sql, {
+                db.sequelize.query( sql, {
                     replacements: changed_user
                 }).then(result => {
                     delete changed_user.password;
@@ -171,11 +164,12 @@ exports.updateOne = (req,res) => {
     }
 }
 
+/*-----------------DELETE A USER-----------------*/
 exports.deleteOne = (req, res) => {
     if(req.user[0].user_id == req.params.id){
         let sql =  `DELETE FROM users 
                     WHERE user_id = ?`;
-        sequelize.query( sql, {
+        db.sequelize.query( sql, {
             replacements: [req.params.id]
         }).then(deleted_user => {
             res.json(`Eliminado con éxito usuario con id: ${req.params.id}`);

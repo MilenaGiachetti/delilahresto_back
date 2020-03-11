@@ -1,32 +1,21 @@
-let express    = require('express'),
-    app        = express(),
-    bodyParser = require('body-parser'),
-    cors       = require('cors'),
-    jwt        = require('jsonwebtoken'),
-    Sequelize = require('sequelize');
+/*---------------------------------------------REQUIREMENTS--------------------------------------------*/
+const reqs = require('../config/config');
+const db = require('../config/db_config');
 
-/*---------------------------------------------CONNECTION TO DB---------------------------------------------*/
-/*-----------------CREATE CONNECTION TO DB-----------------*/
-const sequelize = new Sequelize('mysql://root:@localhost:3306/delilah_resto2');
-
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
+/*-----------------JWT PASSWORD-----------------*/
+const jwtPass = reqs.jwtPass;
 
 /*---------------------------------------------MIDDLEWAREs--------------------------------------------*/
-/*-----------------JWT PASSWORD-----------------*/
-const jwtPass = 'uNpASSWORDuNp0c0Malo97531';
 /*-----------------AUTHENTICATE A USER-----------------*/
 exports.authenticateUser = (req, res, next) => {
     if(req.headers.authorization === undefined){
         res.status(401).send('Error: Error al validar usuario, ingrese a su cuenta para ver esta pagina');
     } else {
         const token = req.headers.authorization.split(' ')[1];
-        const verifiedToken = jwt.verify(token, jwtPass);
+        const verifiedToken = reqs.jwt.verify(token, jwtPass);
         let sql =  `SELECT * FROM users 
                     WHERE user_id = ?`;
-        sequelize.query( sql, {
+        db.sequelize.query( sql, {
             replacements: [verifiedToken.user_id], type:sequelize.QueryTypes.SELECT
         }).then(user => {
             if(user === undefined  || !(user.length > 0)){
@@ -50,11 +39,11 @@ exports.authorizateUser = (req, res, next) => {
         res.status(403).send('Error: No tiene acceso a esta pagina');
     } else {
         const token = req.headers.authorization.split(' ')[1];
-        const verifiedToken = jwt.verify(token, jwtPass);
+        const verifiedToken = reqs.jwt.verify(token, jwtPass);
         let sql =  `SELECT * FROM users 
                     WHERE user_id = ? 
                     AND is_admin = 'TRUE'`;
-        sequelize.query( sql, {
+        db.sequelize.query( sql, {
             replacements: [verifiedToken.user_id], type:sequelize.QueryTypes.SELECT
         }).then(user => {
             console.log(user);

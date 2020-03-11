@@ -1,20 +1,6 @@
-let express    = require('express'),
-    app        = express(),
-    bodyParser = require('body-parser'),
-    cors       = require('cors'),
-    jwt        = require('jsonwebtoken'),
-    Sequelize = require('sequelize');
-
-/*---------------------------------------------CONNECTION TO DB---------------------------------------------*/
-/*-----------------CREATE CONNECTION TO DB-----------------*/
-const sequelize = new Sequelize('mysql://root:@localhost:3306/delilah_resto2');
-
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
 /*---------------------------------------------PRODUCTS---------------------------------------------*/
 module.exports = app => {
+    /*-----------------REQUIREMENTS-----------------*/
     const products = require("../controllers/products_controllers");
     const middlewares = require("../middlewares/middlewares");
     let router = require("express").Router();
