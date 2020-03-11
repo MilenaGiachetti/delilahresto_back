@@ -1,6 +1,6 @@
 # Delilah Resto Backend
 
-El Backend de Delilah Resto es el tercer proyecto del curso de Desarrollo Web Full Stack (DWFS) de Acámica. 
+El Backend de Delilah Resto es el tercer proyecto del curso de Desarrollo Web Full Stack (DWFS) de Acámica.  
 Este proyecto se basa en el desarrollo de un backend para un restaurante ficticio utilizando NodeJS, Express y MySQL. Requiere un CRUD de usuarios, productos y ordenes, la posibilidad de que los usuarios puedan hacer un login y, relacionado a esto último, un sistema de autorización y autenticación de usuarios realizado con Json Web Tokens. 
 
 ## Instalación
