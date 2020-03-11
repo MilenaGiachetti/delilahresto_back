@@ -14,7 +14,7 @@
 /*cambiar get de pedidos para que te info tmbn de productos como lo hace el get de un pedido*/ 
 
 /*pensar mejor el contenido de los catchs*/
-
+/*check that all necessary info is sent*/
 /*check that updates dont change elements unique column values to repeated ones*/
 
 let express    = require('express'),
@@ -122,25 +122,10 @@ app.post('/users', (req,res) => {
                 replacements: user
             }).then(result => {
                 console.log(result[0]);
-                /*response with the data of the created user*/
-                let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
-                            FROM users 
-                            WHERE user_id = ?`;
-                sequelize.query( sql, {
-                    replacements: [result[0]], type:sequelize.QueryTypes.SELECT
-                }).then(new_user => {
-                    console.log(new_user);
-                    if (new_user.length === 0) {
-                        res.status(404).send(`Error: no hay usuario con el id ${req.params.id}`)
-                    } else {
-                        /*it should also return the token so it can be already logged in*/
-                        res.json(new_user);
-                    }
-                }).catch((err)=>{
-                    console.log(err);
-                    res.status(500);
-                    res.render('error', { error: err });
-                })
+                user.user_id = result[0];
+                delete user.password;
+                res.json(user);
+                /*it should also return the token so it can be already logged in ?*/
             }).catch((err)=>{
                 console.log(err);
                 res.status(500);
@@ -249,9 +234,9 @@ app.get('/users/:id', authenticateUser, (req,res) => {
 app.put('/users/:id', authenticateUser, (req,res) => {
     if(req.user[0].user_id == req.params.id){
         /*Search for the current user object*/
-        let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, password 
+        let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, password, is_admin
                     FROM users 
-                    WHERE user_id = ? AND is_admin = 'FALSE'`;
+                    WHERE user_id = ?`;
         sequelize.query( sql, {
             replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
         }).then(result => {
@@ -259,6 +244,7 @@ app.put('/users/:id', authenticateUser, (req,res) => {
                 let current_user = result;
                 /*Added conditional in case the request body doesnt send all the users information, in the case of a info not being given it sends the same info that was already in the db*/
                 let changed_user = {
+                    user_id    : req.params.id,
                     username   : req.body.username   !== undefined ? req.body.username   : current_user[0].username,
                     firstname  : req.body.firstname  !== undefined ? req.body.firstname  : current_user[0].firstname,
                     lastname   : req.body.lastname   !== undefined ? req.body.lastname   : current_user[0].lastname,
@@ -267,13 +253,16 @@ app.put('/users/:id', authenticateUser, (req,res) => {
                     phone      : req.body.phone      !== undefined ? req.body.phone      : current_user[0].phone,
                     password   : req.body.password   !== undefined ? req.body.password   : current_user[0].password,
                     last_order : req.body.last_order !== undefined ? req.body.last_order : current_user[0].last_order,
-                    user_id    : req.params.id
+                    is_admin   : current_user[0].is_admin
                 };
-                let sql =  `UPDATE users SET username = :username, firstname = :firstname, lastname = :lastname, email = :email, adress = :adress, phone = :phone, password = :password, last_order = :last_order, is_admin = 'FALSE'
+                let sql =  `UPDATE users SET username = :username, firstname = :firstname, lastname = :lastname, email = :email, adress = :adress, phone = :phone, password = :password, last_order = :last_order, is_admin = :is_admin
                             WHERE user_id = :user_id`;
                 sequelize.query( sql, {
                     replacements: changed_user
                 }).then(result => {
+                    delete changed_user.password;
+                    res.json(changed_user);
+                    /*
                     let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
                     FROM users 
                     WHERE user_id = ?`;
@@ -290,7 +279,7 @@ app.put('/users/:id', authenticateUser, (req,res) => {
                         console.log(err);
                         res.status(500);
                         res.render('error', { error: err });
-                    })     
+                    })     */
                 }).catch((err)=>{
                     console.log(err);
                     res.status(500);
