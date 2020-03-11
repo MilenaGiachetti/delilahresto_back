@@ -262,24 +262,6 @@ app.put('/users/:id', authenticateUser, (req,res) => {
                 }).then(result => {
                     delete changed_user.password;
                     res.json(changed_user);
-                    /*
-                    let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
-                    FROM users 
-                    WHERE user_id = ?`;
-                    sequelize.query( sql, {
-                        replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
-                    }).then(new_user => {
-                        console.log(new_user);
-                        if (new_user.length === 0) {
-                            res.status(404).send(`Error: no hay usuario con el id ${req.params.id}`)
-                        } else {
-                            res.json(new_user);
-                        }
-                    }).catch((err)=>{
-                        console.log(err);
-                        res.status(500);
-                        res.render('error', { error: err });
-                    })     */
                 }).catch((err)=>{
                     console.log(err);
                     res.status(500);
@@ -332,29 +314,22 @@ app.delete('/users/:id', authenticateUser, (req, res) => {
 /*---------------------------------------------PRODUCTS---------------------------------------------*/
 /*-----------------ADD A PRODUCT-----------------*/
 app.post('/products', authorizateUser, (req,res) => {
-    let product = {
+    let new_product = {
         product_name : req.body.product_name,
         abbreviation : req.body.abbreviation,
         link_img     : req.body.link_img,
         price        : req.body.price
     };
-
-    let sql = 'INSERT INTO products SET product_name = :product_name, abbreviation = :abbreviation, link_img = :link_img, price = :price';
+    let sql =  `INSERT  INTO products 
+                        SET product_name = :product_name, 
+                            abbreviation = :abbreviation, 
+                            link_img     = :link_img, 
+                            price        = :price`;
     sequelize.query( sql, {
-        replacements: product
+        replacements: new_product
     }).then(result => {
-        console.log(result);
-        let sql =  `SELECT * FROM products 
-                    WHERE product_id = ?`;
-        sequelize.query( sql, {
-            replacements: [result[0]], type:sequelize.QueryTypes.SELECT
-        }).then(new_product => {
-            res.json(new_product);
-        }).catch((err)=>{
-            console.log(err);
-            res.status(500);
-            res.render('error', { error: err });
-        })
+        new_product.product_id = result[0].insertId;
+        res.json(new_product);
     }).catch((err)=>{
         console.log(err);
         res.status(500);
@@ -423,12 +398,11 @@ app.put('/products/:id', authorizateUser, (req, res) => {
             let current_product = product;
             /*Conditional in case not all the info is sent in the body is added*/
             let changed_product = {
+                product_id   : current_product[0].product_id,
                 product_name : req.body.product_name !== undefined ? req.body.product_name : current_product[0].product_name,
                 abbreviation : req.body.abbreviation !== undefined ? req.body.abbreviation : current_product[0].abbreviation,
                 link_img     : req.body.link_img !== undefined ? req.body.link_img : current_product[0].link_img,
-                price        : req.body.price !== undefined ? req.body.price : current_product[0].price,
-                product_id   : current_product[0].product_id
-
+                price        : req.body.price !== undefined ? req.body.price : current_product[0].price
             };
             let sql =  `UPDATE products 
                         SET product_name = :product_name, abbreviation = :abbreviation, link_img = :link_img, price = :price
@@ -437,17 +411,18 @@ app.put('/products/:id', authorizateUser, (req, res) => {
             sequelize.query( sql, {
                 replacements: changed_product
             }).then(update_result => {
-                let sql =  `SELECT * FROM products 
+                res.json(changed_product);
+
+                /*let sql =  `SELECT * FROM products 
                             WHERE product_id = ?`;
                 sequelize.query( sql, {
                     replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
                 }).then(updated_product => {
-                    res.json(updated_product);
                 }).catch((err)=>{
                     console.log(err);
                     res.status(500);
                     res.render('error', { error: err });
-                })
+                })*/
             }).catch((err)=>{
                 console.log(err);
                 res.status(500);
