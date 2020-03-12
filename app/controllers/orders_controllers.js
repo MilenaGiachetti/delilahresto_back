@@ -15,11 +15,9 @@ exports.addOne = (req,res) => {
     async function get(){
         let total_product_quantity = req.body.products.length;
         let product_number = 0;
-        for(let id = 0; id < total_product_quantity; id++){
-            console.log(req.body.products[id]);
-            console.log(Object.keys(req.body.products[id]));
-            let current_product_id = Object.keys(req.body.products[id]);
-            let current_product_quantity =req.body.products[id][current_product_id];
+        for(let i = 0; i < total_product_quantity; i++){
+            let current_product_id = req.body.products[i].product_id;
+            let current_product_quantity =req.body.products[i].product_quantity;
             
             let sql = `SELECT * FROM products WHERE product_id = ?`;
             await sequelize.query( sql, {

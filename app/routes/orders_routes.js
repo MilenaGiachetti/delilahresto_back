@@ -12,11 +12,12 @@ module.exports = app => {
     {
         "payment": "efectivo",
         "products": [
-            {"34": 3},
-            {"2": 1}
+            {"product_id": 34,
+            "product_quantity:1},
+            {"product_id": 2,
+            "product_quantity:1}
         ]
     }*/
-
 
     /*-----------------SEE ALL ORDERS-----------------*/
     router.get('/', middlewares.authorizateUser, orders.findAll);
