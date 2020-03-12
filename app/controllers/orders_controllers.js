@@ -20,17 +20,21 @@ exports.addOne = (req,res) => {
             await sequelize.query( sql, {
                 replacements: [id], type:sequelize.QueryTypes.SELECT
             }).then(result => {
-                product_number += 1;
-                description += req.body.products[id] + "x" + result[0].abbreviation + " ";
-                total_price += req.body.products[id]*(+result[0].price);
-                products_order.push({
-                    "product_id"      : id,
-                    "product_quantity": req.body.products[id],
-                    "user_id"         : req.user[0].user_id
-                })
-                /*Checking for the last iteration so the info can be sent to be inserted in the order and products_orders tables */
-                if(product_number === product_quantity){
-                    insert(products_order, description, total_price);
+                if( result[0] === undefined ) {
+                    res.status(404).send('Error: uno o más de los productos enviados en el pedido no existen');
+                } else {
+                    product_number += 1;
+                    description += req.body.products[id] + "x" + result[0].abbreviation + " ";
+                    total_price += req.body.products[id]*(+result[0].price);
+                    products_order.push({
+                        "product_id"       : id,
+                        "product_quantity" : req.body.products[id],
+                        "user_id"          : req.user[0].user_id
+                    })
+                    /*Checking for the last iteration so the info can be sent to be inserted in the order and products_orders tables */
+                    if(product_number === product_quantity){
+                        insert(products_order, description, total_price);
+                    }
                 }
             }).catch((err)=>{
                 res.status(500).send( 'Error: ' + err );
@@ -46,7 +50,8 @@ exports.addOne = (req,res) => {
             total_price : total_price,
             user_id     : req.user[0].user_id
         };
-        let sql = 'INSERT INTO orders SET description = :description, payment = :payment, order_state = :order_state, total_price= :total_price, user_id = :user_id';
+        let sql = `INSERT INTO orders
+                   SET description = :description, payment = :payment, order_state = :order_state, total_price= :total_price, user_id = :user_id`;
         sequelize.query( sql, {
             replacements: order
         }).then(result => {
@@ -62,17 +67,19 @@ exports.addOne = (req,res) => {
                 last_order : result[0],
                 is_admin   : req.user[0].is_admin
             };
-            let sql =  `UPDATE users SET user_id = :user_id, username = :username, firstname = :firstname, lastname = :lastname, email = :email, adress = :adress, phone = :phone, password = :password, last_order = :last_order, is_admin = :is_admin
+            let sql =  `UPDATE users 
+                        SET user_id = :user_id, username = :username, firstname = :firstname, lastname = :lastname, email = :email, adress = :adress, phone = :phone, password = :password, last_order = :last_order, is_admin = :is_admin
                         WHERE user_id = :user_id`;
             sequelize.query( sql, {
                 replacements: changed_user
-            }).then((result) => {
+            }).then((update_user_result) => {
                 products_order.forEach(product => {
                     product["order_id"] = result[0];
-                    let sql = `INSERT INTO products_orders SET order_id= :order_id, product_id = :product_id, product_quantity = :product_quantity, user_id = :user_id`;
+                    let sql =  `INSERT INTO products_orders 
+                                SET order_id= :order_id, product_id = :product_id, product_quantity = :product_quantity, user_id = :user_id`;
                     sequelize.query( sql, {
                         replacements: product
-                    }).catch((err)=>{
+                    }).catch((err) => {
                         res.status(500).send( 'Error: ' + err );
                     })
                 })
@@ -159,7 +166,7 @@ exports.findOne = (req, res) => {
         replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(result_order => {
         if (result_order.length === 0) {
-            res.status(404).send("Pedido no existente");
+            res.status(404).send("Error: Pedido no existente");
         } else {
             if(req.user[0].user_id === result_order[0].user_id || req.user[0].is_admin === 'TRUE'){
                 let order = {
@@ -236,7 +243,7 @@ exports.deleteOne = (req,res) => {
         replacements: [req.params.id]
     }).then((order_result) => {
         if (order_result[0].affectedRows === 0) {
-            res.status(404).send("Pedido no existente");
+            res.status(404).send("Error: Pedido no existente");
         } else {
             /*Erased from user as last_order*/
             let sql =  `UPDATE users 
