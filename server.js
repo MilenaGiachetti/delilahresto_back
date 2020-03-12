@@ -11,6 +11,8 @@
 /*deberian administradores poder eliminar usuarios?*/
 /*Validar existencia de productos al crear un pedido*/
 
+/*Simplify new order*/
+
 /*check that all necessary info is sent*/
 
 /*---------------------------------------------REQUIREMENTS--------------------------------------------*/

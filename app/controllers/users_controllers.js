@@ -67,7 +67,7 @@ exports.addOne = (req,res) => {
 
 /*-----------------SEE ALL USERS-----------------*/
 /*exports.findAll = (req,res) => {
-    let sql = `SELECT username, firstname, lastname, email, adress, phone FROM users WHERE is_admin = 'FALSE'`;
+    let sql = `SELECT user_id, username, firstname, lastname, email, adress, phone FROM users WHERE is_admin = 'FALSE'`;
     sequelize.query( sql, {
         type:sequelize.QueryTypes.SELECT
     }).then(all_users => {
@@ -84,7 +84,7 @@ exports.addOne = (req,res) => {
 /*-----------------SEE A USER-----------------*/
 exports.findOne = (req, res) => {
     if(req.user[0].user_id == req.params.id || req.user[0].is_admin === 'TRUE'){
-        let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
+        let sql =  `SELECT user_id, username, firstname, lastname, email, adress, phone, last_order, is_admin 
                         FROM users 
                         WHERE user_id = ?`;
         sequelize.query( sql, {
@@ -139,7 +139,7 @@ exports.updateOne = (req,res) => {
                     res.status(500).send( 'Error: ' + err );
                 })           
             } else {
-                res.send(`Error: no hay usuario con el id ${req.params.id}`)
+                res.status(404).send(`Error: no hay usuario con el id ${req.params.id}`)
             }
         }).catch((err)=>{
             res.status(500).send( 'Error: ' + err );

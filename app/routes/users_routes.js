@@ -16,7 +16,6 @@ module.exports = app => {
         "email": "lukeskywalker@jedi.sw",
         "adress": "526 Tatooine",
         "phone": 1545879563,
-        "last_order": 0,
         "password": "Luke"
     }
     {
