@@ -13,9 +13,9 @@ module.exports = app => {
         "payment": "efectivo",
         "products": [
             {"product_id": 34,
-            "product_quantity:1},
+            "product_quantity":1},
             {"product_id": 2,
-            "product_quantity:1}
+            "product_quantity":1}
         ]
     }*/
 
