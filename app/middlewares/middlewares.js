@@ -1,6 +1,6 @@
 /*---------------------------------------------REQUIREMENTS--------------------------------------------*/
 const reqs = require('../config/config');
-const db = require('../config/db_config');
+const sequelize = require('../config/db_config');
 
 /*-----------------JWT PASSWORD-----------------*/
 const jwtPass = reqs.jwtPass;
@@ -15,7 +15,7 @@ exports.authenticateUser = (req, res, next) => {
         const verifiedToken = reqs.jwt.verify(token, jwtPass);
         let sql =  `SELECT * FROM users 
                     WHERE user_id = ?`;
-        db.sequelize.query( sql, {
+        sequelize.query( sql, {
             replacements: [verifiedToken.user_id], type:sequelize.QueryTypes.SELECT
         }).then(user => {
             if(user === undefined  || !(user.length > 0)){
@@ -43,7 +43,7 @@ exports.authorizateUser = (req, res, next) => {
         let sql =  `SELECT * FROM users 
                     WHERE user_id = ? 
                     AND is_admin = 'TRUE'`;
-        db.sequelize.query( sql, {
+        sequelize.query( sql, {
             replacements: [verifiedToken.user_id], type:sequelize.QueryTypes.SELECT
         }).then(user => {
             console.log(user);

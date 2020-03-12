@@ -1,6 +1,6 @@
 /*---------------------------------------------REQUIREMENTS--------------------------------------------*/
 const reqs = require('../config/config');
-const db = require('../config/db_config');
+const sequelize = require('../config/db_config');
 
 /*---------------------------------------------USER LOG IN--------------------------------------------*/
 exports.login = (req,res) => {
@@ -8,7 +8,7 @@ exports.login = (req,res) => {
     let sql =  `SELECT * FROM users 
                 WHERE (username = :username OR email = :email) 
                 AND password = :password`;
-    db.sequelize.query( sql, {
+    sequelize.query( sql, {
         replacements: {username : req.body.username , email: req.body.username,password : req.body.password}, type:sequelize.QueryTypes.SELECT
     }).then(result => {
         /*error management*/

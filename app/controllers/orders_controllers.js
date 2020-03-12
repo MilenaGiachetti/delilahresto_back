@@ -1,5 +1,5 @@
 /*---------------------------------------------REQUIREMENTS--------------------------------------------*/
-const db = require('../config/db_config');
+const sequelize = require('../config/db_config');
 
 /*---------------------------------------------ORDERS--------------------------------------------*/
 /*-----------------ADD A ORDER-----------------*/
@@ -17,7 +17,7 @@ exports.addOne = (req,res) => {
         let product_number = 0;
         for(let id in req.body.products){
             let sql = `SELECT * FROM products WHERE product_id = ?`;
-            await db.sequelize.query( sql, {
+            await sequelize.query( sql, {
                 replacements: [id], type:sequelize.QueryTypes.SELECT
             }).then(result => {
                 product_number += 1;
@@ -48,7 +48,7 @@ exports.addOne = (req,res) => {
             user_id     : req.user[0].user_id
         };
         let sql = 'INSERT INTO orders SET description = :description, payment = :payment, order_state = :order_state, total_price= :total_price, user_id = :user_id';
-        db.sequelize.query( sql, {
+        sequelize.query( sql, {
             replacements: order
         }).then(result => {
             let changed_user = {
@@ -65,7 +65,7 @@ exports.addOne = (req,res) => {
             };
             let sql =  `UPDATE users SET user_id = :user_id, username = :username, firstname = :firstname, lastname = :lastname, email = :email, adress = :adress, phone = :phone, password = :password, last_order = :last_order, is_admin = :is_admin
                         WHERE user_id = :user_id`;
-            db.sequelize.query( sql, {
+            sequelize.query( sql, {
                 replacements: changed_user
             }).then((result) => {
                 products_order.forEach(product => {
@@ -96,7 +96,7 @@ exports.findAll = (req, res) => {
                 FROM orders 
                 INNER JOIN products_orders ON products_orders.order_id = orders.order_id 
                 INNER JOIN products ON products_orders.product_id = products.product_id`;
-    db.sequelize.query( sql, {
+    sequelize.query( sql, {
         type:sequelize.QueryTypes.SELECT
     }).then(all_orders => {
         if (all_orders.length === 0) {
@@ -160,7 +160,7 @@ exports.findOne = (req, res) => {
                 INNER JOIN products_orders ON products_orders.order_id = orders.order_id 
                 INNER JOIN products ON products_orders.product_id = products.product_id 
                 WHERE orders.order_id = ?`;
-    db.sequelize.query( sql, {
+    sequelize.query( sql, {
         replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(result_order => {
         if (result_order.length === 0) {
@@ -202,34 +202,13 @@ exports.findOne = (req, res) => {
 
 /*-----------------UPDATE A ORDER-----------------*/
 exports.updateOne = (req,res) => {
-    let sql =  `SELECT * FROM orders 
-                WHERE order_id = ?`;
-    db.sequelize.query( sql, {
-        replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
-    }).then(current_order => {
-        if (current_order.length === 0) {
-            res.status(404).send("Pedido no existente");
-        } else {
-            let changed_order = {
-                order_id    : req.params.id,
-                description : current_order[0].description,
-                payment     : current_order[0].payment,
-                order_state : req.body.order_state !== undefined ? req.body.order_state : current_order[0].order_state,
-                total_price : current_order[0].total_price,
-                user_id     : current_order[0].user_id
-            };
-            let sql =  `UPDATE orders 
-                        SET  description = :description, payment = :payment, order_state = :order_state, total_price= :total_price, user_id = :user_id
-                        WHERE order_id = :order_id`;
-            db.sequelize.query( sql, {
-                replacements: changed_order
-            }).then(order => {
-                res.json((`Cambiado con éxito estado de pedido con id ${req.params.id} a '${changed_order.order_state}'`));
-            }).catch((err)=>{
-                res.status(500);
-                res.render('error', { error: err });
-            })
-        }
+    let sql =  `UPDATE orders 
+                SET  order_state = :order_state
+                WHERE order_id = :order_id`;
+    sequelize.query( sql, {
+        replacements: {order_state: req.body.order_state, order_id: req.params.id}
+    }).then(order => {
+        res.json((`Cambiado con éxito estado de pedido con id ${req.params.id} a '${req.body.order_state}'`));
     }).catch((err)=>{
         res.status(500);
         res.render('error', { error: err });
@@ -240,7 +219,7 @@ exports.updateOne = (req,res) => {
 exports.deleteOne = (req,res) => {
     let sql =  `DELETE FROM orders
                 WHERE order_id = ?`;
-    db.sequelize.query( sql, {
+    sequelize.query( sql, {
         replacements: [req.params.id]
     }).then((order_result) => {
         if (order_result[0].affectedRows === 0) {
@@ -248,7 +227,7 @@ exports.deleteOne = (req,res) => {
         } else {
             let sql =  `DELETE FROM products_orders
                 WHERE order_id = ?`;
-            db.sequelize.query( sql, {
+            sequelize.query( sql, {
                 replacements: [req.params.id]
             }).then((product_result) => {
                 if (product_result[0].affectedRows === 0) {

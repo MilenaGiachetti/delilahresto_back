@@ -7,12 +7,11 @@
 /*deberian administradores poder eliminar usuarios?*/
 /*Validar existencia de productos al crear un pedido*/
 /*ordernar json de ver un pedido*/
-/*cambiar get de pedidos para que te info tmbn de productos como lo hace el get de un pedido*/ 
+
 /*pensar mejor el contenido de los catchs*/
 /*check that all necessary info is sent*/
 /*check that updates dont change elements unique column values to repeated ones*/
 /*check if update orders can only send the new info to avoid the select query */
-/*Agregar jwtpass a config file*/
 
 /*---------------------------------------------REQUIREMENTS--------------------------------------------*/
 const reqs = require('./app/config/config');
@@ -21,7 +20,7 @@ const reqs = require('./app/config/config');
 require('./app/routes/users_routes')(reqs.app);
 require('./app/routes/products_routes')(reqs.app);
 require('./app/routes/orders_routes')(reqs.app);
-require('./app/routes/login_route')(reqs.app);
+require('./app/routes/login_route')(reqs.app); 
 reqs.app.get('/*', (req, res)=> {
     res.status(404).send("Error: Endpoint no existente");
 })

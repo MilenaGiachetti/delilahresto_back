@@ -1,5 +1,5 @@
 /*---------------------------------------------REQUIREMENTS--------------------------------------------*/
-const db = require('../config/db_config');
+const sequelize = require('../config/db_config');
 
 /*---------------------------------------------USERS--------------------------------------------*/
 /*-----------------ADD A USER-----------------*/
@@ -7,7 +7,7 @@ exports.addOne = (req,res) => {
     let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
                         FROM users 
                         WHERE username = ? OR email = ?`;
-    db.sequelize.query( sql, {
+    sequelize.query( sql, {
         replacements: [req.body.username, req.body.email], type:sequelize.QueryTypes.SELECT
     }).then(repeated_user => {
         if (repeated_user.length === 0) {
@@ -24,7 +24,7 @@ exports.addOne = (req,res) => {
                 is_admin   : 'FALSE'
             };
             let sql = `INSERT INTO users VALUES (:user_id, :username, :firstname, :lastname, :email, :adress, :phone, :password, :last_order, :is_admin)`;
-            db.sequelize.query( sql, {
+            sequelize.query( sql, {
                 replacements: user
             }).then(result => {
                 user.user_id = result[0];
@@ -70,7 +70,7 @@ exports.addOne = (req,res) => {
 /*-----------------SEE ALL USERS-----------------*/
 /*exports.findAll = (req,res) => {
     let sql = `SELECT username, firstname, lastname, email, adress, phone FROM users WHERE is_admin = 'FALSE'`;
-    db.sequelize.query( sql, {
+    sequelize.query( sql, {
         type:sequelize.QueryTypes.SELECT
     }).then(all_users => {
         if (all_users.length === 0) {
@@ -90,7 +90,7 @@ exports.findOne = (req, res) => {
         let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
                         FROM users 
                         WHERE user_id = ?`;
-        db.sequelize.query( sql, {
+        sequelize.query( sql, {
             replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
         }).then(user => {
             if (user.length === 0) {
@@ -114,7 +114,7 @@ exports.updateOne = (req,res) => {
         let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, password, is_admin
                     FROM users 
                     WHERE user_id = ?`;
-        db.sequelize.query( sql, {
+        sequelize.query( sql, {
             replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
         }).then(result => {
             if (result.length > 0) {
@@ -134,7 +134,7 @@ exports.updateOne = (req,res) => {
                 };
                 let sql =  `UPDATE users SET username = :username, firstname = :firstname, lastname = :lastname, email = :email, adress = :adress, phone = :phone, password = :password, last_order = :last_order, is_admin = :is_admin
                             WHERE user_id = :user_id`;
-                db.sequelize.query( sql, {
+                sequelize.query( sql, {
                     replacements: changed_user
                 }).then(result => {
                     delete changed_user.password;
@@ -160,7 +160,7 @@ exports.deleteOne = (req, res) => {
     if(req.user[0].user_id == req.params.id){
         let sql =  `DELETE FROM users 
                     WHERE user_id = ?`;
-        db.sequelize.query( sql, {
+        sequelize.query( sql, {
             replacements: [req.params.id]
         }).then(deleted_user => {
             res.json(`Eliminado con éxito usuario con id: ${req.params.id}`);

@@ -1,5 +1,5 @@
 /*---------------------------------------------REQUIREMENTS--------------------------------------------*/
-const db = require('../config/db_config');
+const sequelize = require('../config/db_config');
 
 /*---------------------------------------------PRODUCTS--------------------------------------------*/
 /*-----------------ADD A PRODUCT-----------------*/
@@ -15,7 +15,7 @@ exports.addOne = (req,res) => {
                             abbreviation = :abbreviation, 
                             link_img     = :link_img, 
                             price        = :price`;
-    db.sequelize.query( sql, {
+    sequelize.query( sql, {
         replacements: new_product
     }).then(result => {
         new_product.product_id = result[0].insertId;
@@ -29,7 +29,7 @@ exports.addOne = (req,res) => {
 /*-----------------SEE ALL PRODUCTS-----------------*/
 exports.findAll = (req,res) => {
     let sql = 'SELECT * FROM products';
-    db.sequelize.query( sql, {
+    sequelize.query( sql, {
         replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(products => {
         if (products.length === 0) {
@@ -47,7 +47,7 @@ exports.findAll = (req,res) => {
 exports.findOne = (req, res) => {
     let sql =  `SELECT * FROM products 
                 WHERE product_id = ?`;
-    db.sequelize.query( sql, {
+    sequelize.query( sql, {
         replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(product => {
         if (product.length === 0) {
@@ -65,7 +65,7 @@ exports.findOne = (req, res) => {
 exports.updateOne = (req, res) => {
     let sql =  `SELECT * FROM products 
                 WHERE product_id = ?`;
-    db.sequelize.query( sql, {
+    sequelize.query( sql, {
         replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(product => {
         if (product.length === 0) {
@@ -84,7 +84,7 @@ exports.updateOne = (req, res) => {
                         SET product_name = :product_name, abbreviation = :abbreviation, link_img = :link_img, price = :price
                         WHERE product_id = :product_id `;
 
-            db.sequelize.query( sql, {
+            sequelize.query( sql, {
                 replacements: changed_product
             }).then(update_result => {
                 res.json(changed_product);
@@ -103,7 +103,7 @@ exports.updateOne = (req, res) => {
 exports.deleteOne = (req,res) => {
     let sql =  `DELETE FROM products 
                 WHERE product_id = ?`;
-    db.sequelize.query( sql, {
+    sequelize.query( sql, {
         replacements: [req.params.id]
     }).then(product => {
         if (product[0].affectedRows === 0) {

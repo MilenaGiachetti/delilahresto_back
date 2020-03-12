@@ -1,9 +1,9 @@
 /*---------------------------------------------CONNECTION TO DB---------------------------------------------*/
-const Sequelize   = require('sequelize'),
-      sequelize   = new Sequelize('mysql://root:@localhost:3306/delilah_resto2'),
-      db          = {};
+const Sequelize   = require('sequelize');
+const sequelize   = new Sequelize('mysql://root:@localhost:3306/delilah_resto2');
+/*let   db          = {};
 
 db.sequelize      = sequelize;
-db.Sequelize      = Sequelize;
+db.Sequelize      = Sequelize;*/
 
-module.exports    = db;
+module.exports    = sequelize;
