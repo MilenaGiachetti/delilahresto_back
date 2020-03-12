@@ -1,0 +1,200 @@
+﻿SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+CREATE DATABASE delilah_resto;
+
+CREATE TABLE `delilah_resto`.`orders` (
+  `order_id` int(11) NOT NULL,
+  `description` varchar(64) NOT NULL,
+  `payment` enum('efectivo','credito','debito') NOT NULL,
+  `order_state` enum('nuevo','confirmado','preparando','enviando','entregado','cancelado') NOT NULL DEFAULT 'nuevo',
+  `date` date NOT NULL DEFAULT current_timestamp(),
+  `hour` time NOT NULL DEFAULT current_timestamp(),
+  `total_price` int(6) NOT NULL,
+  `user_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+
+INSERT INTO `delilah_resto`.`orders` (`order_id`, `description`, `payment`, `order_state`, `date`, `hour`, `total_price`, `user_id`) VALUES
+(1, '1xHamVegg 1xAgua', 'debito', 'entregado', '2020-03-02', '12:30:22', 360, 5),
+(2, '1xTacCarn', 'efectivo', 'entregado', '2020-03-02', '12:45:32', 230, 4),
+(3, '3xHamDob 2xCervLat 1xAgua', 'credito', 'cancelado', '2020-03-02', '13:20:18', 1350, 15),
+(4, '2xTacPol 2xBebLim', 'debito', 'entregado', '2020-03-02', '13:26:15', 580, 11),
+(5, '1xHamHon', 'efectivo', 'entregado', '2020-03-02', '14:52:16', 330, 7),
+(6, '1xSandVegg 1xEnsCam 2xCheeChoc 1xCervBot', 'debito', 'entregado', '2020-03-02', '14:56:55', 840, 21),
+(7, '1xEnsPast', 'efectivo', 'entregado', '2020-03-02', '15:02:55', 280, 24),
+(8, '1xTacPic', 'efectivo', 'entregado', '2020-03-02', '15:33:06', 220, 27),
+(9, '2xHamDob 1xHamVegg 2xNacVeg 6xCervLat', 'credito', 'entregado', '2020-03-02', '21:16:52', 2200, 4),
+(10, '1xBagQue 1xTostHue 1xCheeAran 1xPieAran 2xBebMar', 'efectivo', 'entregado', '2020-03-03', '18:12:16', 665, 26),
+(11, '1xPiePer 1xCheeMang 2xBebPom', 'debito', 'enviando', '2020-03-03', '21:33:59', 405, 13),
+(12, '2xSandJam 2xCocaLat', 'debito', 'preparando', '2020-03-03', '21:45:02', 560, 3),
+(13, '1xBagSalm', 'efectivo', 'confirmado', '2020-03-03', '21:59:32', 150, 5),
+(14, '2xHamHon 2xHamBac 4xFritas 8xCervLat', 'credito', 'confirmado', '2020-03-03', '22:03:06', 2560, 28),
+(15, '2xTostPal', 'efectivo', 'nuevo', '2020-03-03', '22:06:47', 230, 6);
+
+
+CREATE TABLE `delilah_resto`.`products` (
+  `product_id` int(11) NOT NULL,
+  `product_name` varchar(64) NOT NULL,
+  `abbreviation` varchar(8) NOT NULL,
+  `link_img` varchar(1000) NOT NULL,
+  `price` int(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO `delilah_resto`.`products` (`product_id`, `product_name`, `abbreviation`, `link_img`, `price`) VALUES
+(1, 'Hamburguesa Veggie', 'HamVegg', 'https://images.unsplash.com/photo-1540265556701-ae209ac395cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60', 300),
+(2, 'Hamburguesa Doble', 'HamDob', 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 370),
+(3, 'Hamburguesa Clásica', 'HamClas', 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 310),
+(4, 'Hamburguesa con Hongos', 'HamHon', 'https://images.unsplash.com/photo-1549611016-3a70d82b5040?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 330),
+(5, 'Hamburguesa de Pollo', 'HamPol', 'https://images.unsplash.com/photo-1566217688581-b2191944c2f9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 340),
+(6, 'Hamburguesa con Bacon', 'HamBac', 'https://images.unsplash.com/photo-1565060050382-f180053db6fa?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 400),
+(7, 'Papas Fritas', 'Fritas', 'https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 95),
+(8, 'Sandwich Veggie', 'SandVegg', 'https://images.unsplash.com/photo-1539252554453-80ab65ce3586?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 200),
+(9, 'Sandwich de Carne', 'SandCarn', 'https://images.unsplash.com/photo-1554433607-66b5efe9d304?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 250),
+(10, 'Sandwich de Atún', 'SandAtu', 'https://images.unsplash.com/photo-1558985250-27a406d64cb3?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 220),
+(11, 'Sandwich de Jamón', 'SandJam', 'https://images.unsplash.com/photo-1520174691701-bc555a3404ca?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60', 230),
+(12, 'Sandwich Tostado de Queso', 'SandQue', 'https://images.unsplash.com/photo-1475090169767-40ed8d18f67d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 200),
+(13, 'Bagel de Salmón', 'BagSalm', 'https://images.unsplash.com/photo-1572137162111-fc6e04414e21?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 150),
+(14, 'Bagel con Queso crema', 'BagQue', 'https://images.unsplash.com/photo-1572982270458-ad80e5fcc49a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 120),
+(15, 'Bagel con Pollo', 'BagPol', 'https://images.unsplash.com/photo-1554474217-1c86a5163807?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 120),
+(16, 'Tostada de Palta Veggie', 'TostPal', 'https://images.unsplash.com/photo-1551266519-b6713933ebd6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 115),
+(17, 'Tostada con Palta y Huevo', 'TostHue', 'https://images.unsplash.com/photo-1525351484163-7529414344d8?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 125),
+(18, 'Ensalada Veggie', 'EnsVegg', 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 220),
+(19, 'Ensalada Cesar', 'EnsCes', 'https://images.unsplash.com/photo-1546793665-c74683f339c1?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 270),
+(20, 'Ensalada Verde', 'EnsVerd', 'https://images.unsplash.com/photo-1511994714008-b6d68a8b32a2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 220),
+(21, 'Ensalada de Camarones', 'EnsCam', 'https://images.unsplash.com/photo-1551248429-40975aa4de74?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 300),
+(22, 'Ensalada de Pasta y Pesto', 'EnsPast', 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 280),
+(23, 'Taco de Carne', 'TacCarn', 'https://images.unsplash.com/photo-1504544750208-dc0358e63f7f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 230),
+(24, 'Taco de Pollo', 'TacPol', 'https://images.unsplash.com/photo-1568106690101-fd6822e876f6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 200),
+(25, 'Taco Veggie', 'TacVegg', 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 180),
+(26, 'Taco de Carne Picante', 'TacPic', 'https://images.unsplash.com/photo-1574782091246-c65ed4510300?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 220),
+(27, 'Nachos con Carne', 'NacCarn', 'https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 175),
+(28, 'Nachos con Salsas Veggie', 'NacVeg', 'https://images.unsplash.com/photo-1523634700860-90d0ef74f137?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 160),
+(29, 'Lemon Pie (Porción)', 'PieLem', 'https://images.unsplash.com/photo-1519915028121-7d3463d20b13?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 90),
+(30, 'Tarta de Arándanos (Porción)', 'PieAran', 'https://images.unsplash.com/photo-1476887334197-56adbf254e1a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 90),
+(31, 'Tarta de Peras (Porción)', 'PiePer', 'https://images.unsplash.com/photo-1562007908-72e11e85b1cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 115),
+(32, 'Cheesecake con Salsa de Caramelo (Porción)', 'CheeCar', 'https://images.unsplash.com/photo-1547414368-ac947d00b91d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 100),
+(33, 'Cheesecake de Arándanos (Porción)', 'CheeAran', 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 110),
+(34, 'Cheesecake de Chocolate (Porción)', 'CheeChoc', 'https://images.unsplash.com/photo-1508737804141-4c3b688e2546?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 100),
+(35, 'Cheesecake de Mango (Porción)', 'CheeMang', 'https://images.unsplash.com/photo-1570781148825-b9c37b9531e7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 130),
+(36, 'Cerveza (500ml)', 'CervLat', 'https://images.unsplash.com/photo-1580805375657-ea29c6624dd9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 90),
+(37, 'Cerveza (1l)', 'CervBot', 'https://images.unsplash.com/photo-1499424474736-c040d0665d84?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 140),
+(38, 'Soju (600ml)', 'SojuBot', 'https://images.unsplash.com/photo-1528615141309-53f2564d3be8?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 210),
+(39, 'Bebida de Maracuyá (500ml)', 'BebMar', 'https://images.unsplash.com/photo-1548158518-c2f131b1aa01?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 110),
+(40, 'Limonada (600ml)', 'BebLim', 'https://images.unsplash.com/photo-1556881286-fc6915169721?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 90),
+(41, 'Pomelada (600ml)', 'BebPom', 'https://images.unsplash.com/photo-1500631195312-e3a9a5819f92?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 90),
+(42, 'Pepsi (330ml)', 'PepsiLat', 'https://images.unsplash.com/photo-1546695259-ad30ff3fd643?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 50),
+(43, 'Pepsi (500ml)', 'PepsiBot', 'https://images.unsplash.com/photo-1558456210-a51b371a4b63?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 80),
+(44, 'Coca-Cola (330ml)', 'CocaLat', 'https://images.unsplash.com/photo-1571814582435-672b9e1df15d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 50),
+(45, 'Coca-Cola (500ml)', 'CocaBot', 'https://images.unsplash.com/flagged/photo-1567861248188-7f920f024c8c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 80),
+(46, 'Agua mineral', 'Agua', 'https://images.unsplash.com/photo-1546498159-9a2fac87e770?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60', 60);
+
+CREATE TABLE `delilah_resto`.`products_orders` (
+  `order_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `product_quantity` int(2) NOT NULL,
+  `user_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO `delilah_resto`.`products_orders` (`order_id`, `product_id`, `product_quantity`, `user_id`) VALUES
+(1, 1, 1, 5),
+(1, 46, 1, 5),
+(2, 23, 1, 4),
+(3, 2, 3, 15),
+(3, 36, 2, 15),
+(3, 46, 1, 15),
+(4, 24, 2, 11),
+(4, 40, 2, 11),
+(5, 4, 1, 7),
+(6, 8, 1, 21),
+(6, 21, 1, 21),
+(6, 34, 2, 21),
+(6, 37, 1, 21),
+(7, 22, 1, 24),
+(8, 26, 1, 27),
+(9, 2, 2, 4),
+(9, 1, 1, 4),
+(9, 28, 2, 4),
+(9, 36, 6, 4),
+(10, 14, 1, 26),
+(10, 17, 1, 26),
+(10, 33, 1, 26),
+(10, 30, 1, 26),
+(10, 39, 2, 26),
+(11, 31, 1, 13),
+(11, 35, 1, 13),
+(11, 41, 2, 13),
+(12, 11, 2, 3),
+(12, 44, 2, 3),
+(13, 13, 3, 5),
+(14, 4, 2, 28),
+(14, 6, 2, 28),
+(14, 7, 4, 28),
+(14, 36, 8, 28),
+(15, 16, 2, 6);
+
+CREATE TABLE `delilah_resto`.`users` (
+  `user_id` int(11) NOT NULL,
+  `username` varchar(64) NOT NULL,
+  `firstname` varchar(64) NOT NULL,
+  `lastname` varchar(64) NOT NULL,
+  `email` varchar(64) NOT NULL,
+  `adress` varchar(64) NOT NULL,
+  `phone` int(16) NOT NULL,
+  `password` varchar(64) NOT NULL,
+  `last_order` int(11) NOT NULL,
+  `is_admin` enum('FALSE','TRUE') NOT NULL DEFAULT 'FALSE'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+INSERT INTO `delilah_resto`.`users` (`user_id`, `username`, `firstname`, `lastname`, `email`, `adress`, `phone`, `password`, `last_order`, `is_admin`) VALUES
+(1, 'TheAdmin', 'Admin', 'Admin', 'admin@delilah.resto', '', 0, 'adminpass', 0, 'TRUE'),
+(2, 'TheSecondAdmin', 'Admin2', 'Admin2', 'secondadmin@delilah.resto', '', 0, 'admin2pass', 0, 'TRUE'),
+(3, 'JonnieBins', 'Jonas', 'Bins', 'jonbins@zoie.me', '3656 Watsica Forest', 1518432774, 'Jonas', 12, 'FALSE'),
+(4, 'Carmelo', 'Marcelino', 'McKenzie', 'marcemc@lonnie.biz', '02362 Uriah Burgs', 1399367233, 'Marcelino', 9, 'FALSE'),
+(5, 'DaniH', 'Daniela', 'Hyatt', 'dani@ethelyn.tv', '05305 Hoeger Orchard', 2147483647, 'Daniela', 13, 'FALSE'),
+(6, 'TriishhK', 'Trisha', 'Kling', 'triish@rubie.me', '415 Jerome Lock', 2147483647, 'Trisha', 15, 'FALSE'),
+(7, 'Anika', 'Anika', 'Zemlak', 'anikazemlak@jarrell.info', '5721 Tavares Avenue', 2147483647, 'Anika', 5, 'FALSE'),
+(8, 'KaylahB', 'Kaylah', 'Braun', 'kaykay@college,edu', '33304 Rogers Streets', 2147483647, 'Kaylah', 0, 'FALSE'),
+(9, 'Ehelina', 'Ethel', 'Roob', 'roobethel@fakemail.com', '998 Walker Corner', 2147483647, 'Ethel', 0, 'FALSE'),
+(10, 'JayKing', 'Jayden', 'Kuhn', 'jayjay@elavionc.ito', '423 Consuelo Garden', 2147483647, 'Jayden', 0, 'FALSE'),
+(11, 'Braz', 'Braxton', 'Lavina', 'blavina@mail.me', '3782 Kirlin Unions', 2147483647, 'Braxton', 4, 'FALSE'),
+(12, 'TobyPadberg', 'Toby', 'Padberg', 'tpadber@fakest.org', '11558 Easter Ways', 1518875408, 'Toby', 0, 'FALSE'),
+(13, 'Keirara', 'Keira', 'Ruecker', 'keirrue@company.com', '5093 Wiegand Rapids', 2147483647, 'Keira', 11, 'FALSE'),
+(14, 'KylaHintz', 'Kyla', 'Hintz', 'kyla_hintz@lexus.ca', '64778 Brett Spring', 2147483647, 'Kyla', 0, 'FALSE'),
+(15, 'Amayita', 'Amaya', 'Nakia', 'Nakiaa@company,com', '78315 Stoltenberg Orchard', 2147483647, 'Amaya', 3, 'FALSE'),
+(16, 'PaoGrimes', 'Paolo', 'Grimes', 'paolog@carmine.co.uk', '9580 Serenity Green', 2147483647, 'Paolo', 0, 'FALSE'),
+(17, 'ElliSanford', 'Ellis', 'Sanford', 'ellissandford@college.com', '08337 Greenfelder Summit', 2147483647, 'Ellis', 0, 'FALSE'),
+(18, 'Fadel', 'Oleta', 'Fadel', 'oletfadel@college.com', '955 Nikolas Forest', 1670218545, 'Oleta', 0, 'FALSE'),
+(19, 'JoeyRie', 'Joey', 'McLaughlin', 'mclaughlin@mail.ar', '44786 Trent Cliff', 1431879482, 'Joey', 0, 'FALSE'),
+(20, 'EthanF', 'Ethan', 'Ford', 'ethan@kattie.ca', '268 Deanna Stream', 2147483647, 'Ethan', 0, 'FALSE'),
+(21, 'WesEast', 'Westley', 'Clifford', 'thewest@college.ar', '0206 Trevor Spurs', 2147483647, 'Westley', 6, 'FALSE'),
+(22, 'Margarita', 'Margret', 'Stracke', 'margiestracke@mail.me', '28250 Ritchie Lane', 1616177886, 'Margret', 0, 'FALSE'),
+(23, 'DarrWhite', 'Darrell', 'White', 'notfromtheoffice@mail.com', '746 Gibson Road', 1608614033, 'Darrell', 0, 'FALSE'),
+(24, 'GilPrice', 'Gilberto', 'Price', 'gilprice@health.edu', '0461 Keegan Cape', 1526287604, 'Gilberto', 7, 'FALSE'),
+(25, 'RiceChelsey', 'Chelsey', 'Rice', 'chelset_rice@college.com', '292 Ron Lock', 1896270724, 'Chelsey', 0, 'FALSE'),
+(26, 'NickieNick', 'Nicholas', 'Huel', 'nickhuel@anothermail.edu', '733 Vandervort Meadows', 2147483647, 'Nicholas', 10, 'FALSE'),
+(27, 'Estelle', 'Estelle', 'Wisoky', 'wisoky@company.org', '115 Elissa Lodge', 2147483647, 'Estelle', 8, 'FALSE'),
+(28, 'JediMaster', 'Luke', 'Skywalker', 'lukeskywalker@jedi.sw', '526 Tatooine', 1545879563, 'Luke', 14, 'FALSE');
+
+ALTER TABLE `delilah_resto`.`orders`
+  ADD PRIMARY KEY (`order_id`);
+
+ALTER TABLE `delilah_resto`.`products`
+  ADD PRIMARY KEY (`product_id`);
+
+ALTER TABLE `delilah_resto`.`users`
+  ADD PRIMARY KEY (`user_id`);
+
+
+ALTER TABLE `delilah_resto`.`orders`
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+ALTER TABLE `delilah_resto`.`products`
+  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+
+ALTER TABLE `delilah_resto`.`users`
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
