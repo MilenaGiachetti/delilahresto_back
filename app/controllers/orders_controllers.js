@@ -13,26 +13,31 @@ exports.addOne = (req,res) => {
     let products_order = [];
     let total_price = 0;
     async function get(){
-        let product_quantity = Object.keys(req.body.products).length;
+        let total_product_quantity = req.body.products.length;
         let product_number = 0;
-        for(let id in req.body.products){
+        for(let id = 0; id < total_product_quantity; id++){
+            console.log(req.body.products[id]);
+            console.log(Object.keys(req.body.products[id]));
+            let current_product_id = Object.keys(req.body.products[id]);
+            let current_product_quantity =req.body.products[id][current_product_id];
+            
             let sql = `SELECT * FROM products WHERE product_id = ?`;
             await sequelize.query( sql, {
-                replacements: [id], type:sequelize.QueryTypes.SELECT
+                replacements: [current_product_id], type:sequelize.QueryTypes.SELECT
             }).then(result => {
                 if( result[0] === undefined ) {
                     res.status(404).send('Error: uno o más de los productos enviados en el pedido no existen');
                 } else {
                     product_number += 1;
-                    description += req.body.products[id] + "x" + result[0].abbreviation + " ";
-                    total_price += req.body.products[id]*(+result[0].price);
+                    description += current_product_quantity + "x" + result[0].abbreviation + " ";
+                    total_price += current_product_quantity*(+result[0].price);
                     products_order.push({
-                        "product_id"       : id,
-                        "product_quantity" : req.body.products[id],
+                        "product_id"       : current_product_id,
+                        "product_quantity" : current_product_quantity,
                         "user_id"          : req.user[0].user_id
                     })
                     /*Checking for the last iteration so the info can be sent to be inserted in the order and products_orders tables */
-                    if(product_number === product_quantity){
+                    if(product_number === total_product_quantity){
                         insert(products_order, description, total_price);
                     }
                 }

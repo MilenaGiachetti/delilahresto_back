@@ -11,11 +11,12 @@ module.exports = app => {
     /*example of info to send in the body:
     {
         "payment": "efectivo",
-        "products": {
-            "34": 3,
-            "2": 1
-        }
+        "products": [
+            {"34": 3},
+            {"2": 1}
+        ]
     }*/
+
 
     /*-----------------SEE ALL ORDERS-----------------*/
     router.get('/', middlewares.authorizateUser, orders.findAll);
