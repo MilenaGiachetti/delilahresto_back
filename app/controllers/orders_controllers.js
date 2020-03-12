@@ -201,18 +201,34 @@ exports.findOne = (req, res) => {
 }
 
 /*-----------------UPDATE A ORDER-----------------*/
+/*only order_state can be changed*/
 exports.updateOne = (req,res) => {
-    let sql =  `UPDATE orders 
-                SET  order_state = :order_state
-                WHERE order_id = :order_id`;
-    sequelize.query( sql, {
-        replacements: {order_state: req.body.order_state, order_id: req.params.id}
-    }).then(order => {
-        res.json((`Cambiado con éxito estado de pedido con id ${req.params.id} a '${req.body.order_state}'`));
-    }).catch((err)=>{
-        res.status(500);
-        res.render('error', { error: err });
-    })
+    if (   req.body.order_state === 'nuevo' 
+        || req.body.order_state === 'confirmado' 
+        || req.body.order_state === 'preparando' 
+        || req.body.order_state === 'enviando' 
+        || req.body.order_state === 'entregado'  
+        || req.body.order_state === 'cancelado'){
+
+        let sql =  `UPDATE orders 
+                    SET  order_state = :order_state
+                    WHERE order_id = :order_id`;
+                    
+        sequelize.query( sql, {
+            replacements: {order_state: req.body.order_state, order_id: req.params.id}
+        }).then(order => {
+            /* the order doenst exists or order_state was changed to the same value*/
+            if (order[0].affectedRows === 0) {
+                res.status(400).send('Error: Orden no existente u orden ya poseía el valor dado de order_state');
+            } else {
+                res.json((`Cambiado con éxito estado de pedido con id ${req.params.id} a '${req.body.order_state}'`));
+            }
+        }).catch((err)=>{
+            res.status(500).send( 'error: ' + err );
+        })
+    } else {
+        res.status(400).send('Error: Ingrese un valor de order_state válido');
+    }
 }
 
 /*-----------------DELETE A ORDER-----------------*/
