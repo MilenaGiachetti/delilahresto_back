@@ -16,4 +16,4 @@ npm install
 
 
 ## Open API
-Para ver más información referirse a la [documentación de la API](https://swagger.io/).
+Para ver más información referirse a la [documentación de la API](https://app.swaggerhub.com/apis/MilenaGiachetti/Delilah_Resto/1.0.0#/).
