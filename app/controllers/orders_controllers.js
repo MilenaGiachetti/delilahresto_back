@@ -227,28 +227,28 @@ exports.updateOne = (req,res) => {
 
 /*-----------------DELETE A ORDER-----------------*/
 exports.deleteOne = (req,res) => {
-    let sql =  `DELETE FROM orders
-                WHERE order_id = ?`;
+    let sql =  `DELETE orders, products_orders 
+                FROM orders
+                INNER JOIN products_orders 
+                    ON orders.order_id = products_orders.order_id
+                WHERE orders.order_id = ?`;
     sequelize.query( sql, {
         replacements: [req.params.id]
     }).then((order_result) => {
         if (order_result[0].affectedRows === 0) {
             res.status(404).send("Pedido no existente");
         } else {
-            let sql =  `DELETE FROM products_orders
-                WHERE order_id = ?`;
+            /*Erased from user as last_order*/
+            let sql =  `UPDATE users 
+                        SET last_order = ?
+                        WHERE last_order = ?`;
             sequelize.query( sql, {
-                replacements: [req.params.id]
-            }).then((product_result) => {
-                if (product_result[0].affectedRows === 0) {
-                    res.status(404).send("Pedido no existente");
-                } else {
-                    res.json(product_result);
-                    /*hace falta agregarle que chequee si el usuario al q corresponde lo tiene como ultima orden en cuyo caso borrarsela*/
-                }
+                replacements: ['0', req.params.id]
+            }).then(result => {
+                res.json('Eliminado con éxito pedido con id: ' + req.params.id);
             }).catch((err)=>{
                 res.status(500).send( 'Error: ' + err );
-            })
+            })           
         }
     }).catch((err)=>{
         res.status(500).send( 'Error: ' + err );
