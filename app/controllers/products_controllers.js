@@ -21,8 +21,7 @@ exports.addOne = (req,res) => {
         new_product.product_id = result[0].insertId;
         res.json(new_product);
     }).catch((err)=>{
-        res.status(500);
-        res.render('error', { error: err });
+        res.status(500).send( 'Error: ' + err );
     })
 }
 
@@ -38,8 +37,7 @@ exports.findAll = (req,res) => {
             res.json(products);
         }
     }).catch((err)=>{
-        res.status(500);
-        res.render('error', { error: err });
+        res.status(500).send( 'Error: ' + err );
     })
 }
 
@@ -56,8 +54,7 @@ exports.findOne = (req, res) => {
             res.json(product);
         }
     }).catch((err)=>{
-        res.status(500);
-        res.render('error', { error: err });
+        res.status(500).send( 'Error: ' + err );
     })
 }
 
@@ -89,13 +86,11 @@ exports.updateOne = (req, res) => {
             }).then(update_result => {
                 res.json(changed_product);
             }).catch((err)=>{
-                res.status(500);
-                res.render('error', { error: err });
+                res.status(500).send( 'Error: ' + err );
             })
         }
     }).catch((err)=>{
-        res.status(500);
-        res.render('error', { error: err });
+        res.status(500).send( 'Error: ' + err );
     })
 }
 
@@ -107,12 +102,11 @@ exports.deleteOne = (req,res) => {
         replacements: [req.params.id]
     }).then(product => {
         if (product[0].affectedRows === 0) {
-            res.status(404).send("Producto no existente");
+            res.status(404).send("Error: Producto no existente");
         } else {
             res.json(`Eliminado con éxito producto con id: ${req.params.id}`);
         }
     }).catch((err)=>{
-        res.status(500);
-        res.render('error', { error: err });
+        res.status(500).send( 'Error: ' + err );
     })
 }

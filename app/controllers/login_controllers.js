@@ -23,7 +23,6 @@ exports.login = (req,res) => {
             res.json({token: token, user_id: user_id});
         }
     }).catch((err)=>{
-        res.status(500);
-        res.render('error', { error: err });
+        res.status(500).send( 'Error: ' + err );
     })
 }

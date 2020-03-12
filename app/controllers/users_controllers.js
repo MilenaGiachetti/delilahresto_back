@@ -32,8 +32,7 @@ exports.addOne = (req,res) => {
                 res.json(user);
                 /*it should also return the token so it can be already logged in ?*/
             }).catch((err)=>{
-                res.status(500);
-                res.render('error', { error: err });
+                res.status(500).send( 'Error: ' + err );
             })
         } else {
             //error handling when there is/are repeated username and/or email
@@ -62,8 +61,7 @@ exports.addOne = (req,res) => {
             }
         }
     }).catch((err)=>{
-        res.status(500);
-        res.render('error', { error: err });
+        res.status(500).send( 'Error: ' + err );
     })
 }
 
@@ -79,8 +77,7 @@ exports.addOne = (req,res) => {
             res.json(all_users);
         }
     }).catch((err)=>{
-        res.status(500);
-        res.render('error', { error: err });
+        res.status(500).send( 'Error: ' + err );
     })
 }*/
 
@@ -99,8 +96,7 @@ exports.findOne = (req, res) => {
                 res.json(user[0]);
             }
         }).catch((err)=>{
-            res.status(500);
-            res.render('error', { error: err });
+            res.status(500).send( 'Error: ' + err );
         })
     } else {
         res.status(403).send("Error: no se encuentra autorizado a ver esta información");
@@ -140,15 +136,13 @@ exports.updateOne = (req,res) => {
                     delete changed_user.password;
                     res.json(changed_user);
                 }).catch((err)=>{
-                    res.status(500);
-                    res.render('error', { error: err });
+                    res.status(500).send( 'Error: ' + err );
                 })           
             } else {
                 res.send(`Error: no hay usuario con el id ${req.params.id}`)
             }
         }).catch((err)=>{
-            res.status(500);
-            res.render('error', { error: err });
+            res.status(500).send( 'Error: ' + err );
         })
     } else {
         res.status(403).send("Error: no se encuentra autorizado para modificar esta información");
@@ -165,8 +159,7 @@ exports.deleteOne = (req, res) => {
         }).then(deleted_user => {
             res.json(`Eliminado con éxito usuario con id: ${req.params.id}`);
         }).catch((err)=>{
-            res.status(500);
-            res.render('error', { error: err });
+            res.status(500).send( 'Error: ' + err );
         })
     } else {
         res.status(403).send("Error: no se encuentra autorizado para eliminar este usuario");

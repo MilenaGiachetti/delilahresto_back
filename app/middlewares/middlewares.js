@@ -26,9 +26,7 @@ exports.authenticateUser = (req, res, next) => {
                 next();
             }
         }).catch((err)=>{
-            console.log(err);
-            res.status(500);
-            res.render('error', { error: err });
+            res.status(500).send( 'Error: ' + err );
         })
     }
 }
@@ -54,9 +52,7 @@ exports.authorizateUser = (req, res, next) => {
                 next();
             }
         }).catch((err)=>{
-            console.log(err);
-            res.status(500);
-            res.render('error', { error: err });
+            res.status(500).send( 'Error: ' + err );
         })
     }
 }

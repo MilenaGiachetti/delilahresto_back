@@ -33,8 +33,7 @@ exports.addOne = (req,res) => {
                     insert(products_order, description, total_price);
                 }
             }).catch((err)=>{
-                res.status(500);
-                res.render('error', { error: err });
+                res.status(500).send( 'Error: ' + err );
             })
         };
     }
@@ -74,18 +73,15 @@ exports.addOne = (req,res) => {
                     sequelize.query( sql, {
                         replacements: product
                     }).catch((err)=>{
-                        res.status(500);
-                        res.render('error', { error: err });
+                        res.status(500).send( 'Error: ' + err );
                     })
                 })
                 res.status(200).send('Pedido creado');
             }).catch((err)=>{
-                res.status(500);
-                res.render('error', { error: err });
+                res.status(500).send( 'Error: ' + err );
             })
         }).catch((err)=>{
-            res.status(500);
-            res.render('error', { error: err });
+            res.status(500).send( 'Error: ' + err );
         })
     }
 }
@@ -148,8 +144,7 @@ exports.findAll = (req, res) => {
             res.json(orders);
         }
     }).catch((err)=>{
-        res.status(500);
-        res.render('error', { error: err });
+        res.status(500).send( 'Error: ' + err );
     })
 }
 
@@ -195,8 +190,7 @@ exports.findOne = (req, res) => {
             }
         }
     }).catch((err)=>{
-        res.status(500);
-        res.render('error', { error: err });
+        res.status(500).send( 'Error: ' + err );
     })
 }
 
@@ -224,7 +218,7 @@ exports.updateOne = (req,res) => {
                 res.json((`Cambiado con éxito estado de pedido con id ${req.params.id} a '${req.body.order_state}'`));
             }
         }).catch((err)=>{
-            res.status(500).send( 'error: ' + err );
+            res.status(500).send( 'Error: ' + err );
         })
     } else {
         res.status(400).send('Error: Ingrese un valor de order_state válido');
@@ -253,12 +247,10 @@ exports.deleteOne = (req,res) => {
                     /*hace falta agregarle que chequee si el usuario al q corresponde lo tiene como ultima orden en cuyo caso borrarsela*/
                 }
             }).catch((err)=>{
-                res.status(500);
-                res.render('error', { error: err });
+                res.status(500).send( 'Error: ' + err );
             })
         }
     }).catch((err)=>{
-        res.status(500);
-        res.render('error', { error: err });
+        res.status(500).send( 'Error: ' + err );
     })
 }
