@@ -22,7 +22,6 @@ const reqs = require('./app/config/config');
 require('./app/routes/users_routes')(reqs.app);
 require('./app/routes/products_routes')(reqs.app);
 require('./app/routes/orders_routes')(reqs.app);
-require('./app/routes/login_route')(reqs.app); 
 reqs.app.get('/*', (req, res)=> {
     res.status(404).send("Error: Endpoint no existente");
 })
