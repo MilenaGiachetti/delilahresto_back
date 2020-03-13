@@ -98,8 +98,7 @@ exports.addOne = (req,res) => {
 
 /*-----------------SEE ALL ORDERS-----------------*/
 exports.findAll = (req, res) => {
-    let sql =  `SELECT *
-                FROM orders 
+    let sql =  `SELECT * FROM orders 
                 INNER JOIN products_orders ON products_orders.order_id = orders.order_id 
                 INNER JOIN products ON products_orders.product_id = products.product_id`;
     sequelize.query( sql, {
@@ -112,6 +111,7 @@ exports.findAll = (req, res) => {
             let order;
             let product;
             function createProduct (i) {
+                console.log(all_orders[i].order_id);
                 product = {
                     product_quantity: all_orders[i].product_quantity,
                     product_id: all_orders[i].product_id,
@@ -122,6 +122,7 @@ exports.findAll = (req, res) => {
                 }
             }
             function createOrder (i) {
+                console.log(all_orders[i].order_id);
                 order = {
                     order_id: all_orders[i].order_id,
                     description: all_orders[i].description,
@@ -136,17 +137,20 @@ exports.findAll = (req, res) => {
             }
             for (let i = 0; i < all_orders.length; i++){
                 if (i === 0 || all_orders[i].order_id !== all_orders[i - 1].order_id){
+                    console.log('if 1, id:'+ all_orders[i].order_id)
                     createOrder(i);
                     createProduct(i);
                     order.products.push(product);
                     if (i === (all_orders.length - 1) || all_orders[i].order_id !== all_orders[i + 1].order_id) {
                         orders.push(order);
                     }
-                } else if (all_orders[i].order_id !== all_orders[i + 1].order_id) { 
+                } else if (i === (all_orders.length - 1) || all_orders[i].order_id !== all_orders[i + 1].order_id) { 
+                    console.log('if 2, id:'+ all_orders[i].order_id)
                     createProduct(i);
                     order.products.push(product);
                     orders.push(order);
                 } else {
+                    console.log('if 3, id:'+ all_orders[i].order_id)
                     createProduct(i);
                     order.products.push(product);
                 }
@@ -154,6 +158,7 @@ exports.findAll = (req, res) => {
             res.json(orders);
         }
     }).catch((err)=>{
+        console.log(err);
         res.status(500).send( 'Error: ' + err );
     })
 }
