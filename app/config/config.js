@@ -2,6 +2,7 @@ const express  = require('express'),
     app        = express(),
     bodyParser = require('body-parser'),
     cors       = require('cors'),
+    bcrypt     = require('bcrypt'),
     jwt        = require('jsonwebtoken'),
     jwtPass = 'uNpASSWORDuNp0c0Malo97531';
 

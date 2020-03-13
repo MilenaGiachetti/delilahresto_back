@@ -55,7 +55,7 @@ module.exports = app => {
     router.delete('/:id', middlewares.authenticateUser, users.deleteOne);
 
     /*---------------------------------------------USER LOG IN---------------------------------------------*/
-    router.post('/login', login.login)
+    router.post('/login', users.login)
     
     /*-----------------ROUTES EXAMPLE USING THE EXISTENT MIDDLEWARES(eliminate)-----------------*/
     //const middlewares = require("../middlewares/middlewares");
