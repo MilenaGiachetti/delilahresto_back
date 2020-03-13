@@ -66,7 +66,7 @@ exports.addOne = (req,res) => {
 }
 
 /*-----------------SEE ALL USERS-----------------*/
-/*exports.findAll = (req,res) => {
+exports.findAll = (req,res) => {
     let sql = `SELECT user_id, username, firstname, lastname, email, adress, phone FROM users WHERE is_admin = 'FALSE'`;
     sequelize.query( sql, {
         type:sequelize.QueryTypes.SELECT
@@ -79,7 +79,7 @@ exports.addOne = (req,res) => {
     }).catch((err)=>{
         res.status(500).send( 'Error: ' + err );
     })
-}*/
+}
 
 /*-----------------SEE A USER-----------------*/
 exports.findOne = (req, res) => {
