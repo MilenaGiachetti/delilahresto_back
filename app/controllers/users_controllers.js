@@ -13,29 +13,34 @@ exports.addOne = (req,res) => {
         replacements: [req.body.username, req.body.email], type:sequelize.QueryTypes.SELECT
     }).then(repeated_user => {
         if (repeated_user.length === 0) {
-            let user = {
-                user_id    : null,
-                username   : req.body.username,
-                firstname  : req.body.firstname,
-                lastname   : req.body.lastname,
-                email      : req.body.email,
-                adress     : req.body.adress,
-                phone      : req.body.phone,
-                password   : req.body.password,
-                last_order : 0,
-                is_admin   : 'FALSE'
-            };
-            let sql = `INSERT INTO users VALUES (:user_id, :username, :firstname, :lastname, :email, :adress, :phone, :password, :last_order, :is_admin)`;
-            sequelize.query( sql, {
-                replacements: user
-            }).then(result => {
-                user.user_id = result[0];
-                delete user.password;
-                res.json(user);
-                /*it should also return the token so it can be already logged in ?*/
-            }).catch((err)=>{
-                res.status(500).send( 'Error: ' + err );
-            })
+            reqs.bcrypt.genSalt(reqs.saltRounds, function(err, salt) {
+                reqs.bcrypt.hash(req.body.password, salt, function(err, hash) {
+                    let user = {
+                        user_id    : null,
+                        username   : req.body.username,
+                        firstname  : req.body.firstname,
+                        lastname   : req.body.lastname,
+                        email      : req.body.email,
+                        adress     : req.body.adress,
+                        phone      : req.body.phone,
+                        password   : hash,
+                        last_order : 0,
+                        is_admin   : 'FALSE'
+                    };
+                    let sql = `INSERT INTO users VALUES (:user_id, :username, :firstname, :lastname, :email, :adress, :phone, :password, :last_order, :is_admin)`;
+                    sequelize.query( sql, {
+                        replacements: user
+                    }).then(result => {
+                        user.user_id = result[0];
+                        delete user.password;
+                        res.json(user);
+                        /*it should also return the token so it can be already logged in ?*/
+                    }).catch((err)=>{
+                        res.status(500).send( 'Error: ' + err );
+                    })
+                });
+            });
+
         } else {
             //error handling when there is/are repeated username and/or email
             let email = 0;
