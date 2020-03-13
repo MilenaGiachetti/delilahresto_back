@@ -86,7 +86,7 @@ exports.addOne = (req,res) => {
                         res.status(500).send( 'Error: ' + err );
                     })
                 })
-                res.status(200).send('Pedido creado');
+                res.status(200).send({'message':'Pedido creado', 'order_id':result[0]});
             }).catch((err)=>{
                 res.status(500).send( 'Error: ' + err );
             })
