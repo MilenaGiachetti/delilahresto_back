@@ -1,21 +1,3 @@
-/*TO DO*/
-/*password no parece ser sensible a Mayus..averiguar*/
-/*encriptar password en la db*/
-/*encriptar password si se cambia update user*/
-
-/*validar que en creacion de usuarios no se repita mail/usuario ya existente*/
-/*validar que en creacion de usuarios no se repita abreviacin/(descripcion tal vez tmbn) ya existente*/
-/*check that updates dont change elements unique column values to repeated ones*/
-
-/*agregar que estos elementos son unicos en la info de la db*/
-
-/*deberian administradores poder eliminar usuarios?*/
-/*Validar existencia de productos al crear un pedido*/
-
-/*Simplify new order*/
-
-/*check that all necessary info is sent*/
-
 /*---------------------------------------------REQUIREMENTS--------------------------------------------*/
 const reqs = require('./app/config/config');
 
