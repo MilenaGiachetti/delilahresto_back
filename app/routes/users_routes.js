@@ -18,6 +18,7 @@ module.exports = app => {
         "phone": 1545879563,
         "password": "Luke"
     }
+
     {
         "username": "Leia",
         "firstname": "Leia",
@@ -29,8 +30,8 @@ module.exports = app => {
     }
     */
 
-    /*-----------------SEE ALL USERS(eliminate)-----------------*/
-    //router.get('/', middlewares.authorizateUser, users.findAll)
+    /*-----------------SEE ALL USERS-----------------*/
+    router.get('/', middlewares.authorizateUser, users.findAll)
 
     /*-----------------SEE A USER-----------------*/
     router.get('/:id', middlewares.authenticateUser, users.findOne);
@@ -66,5 +67,5 @@ module.exports = app => {
         res.send(`Esta es una pagina que requiere autorizacion. Hola Admin!`);
     })*/
 
-    app.use('/users', router);
+    app.use('/usuarios', router);
 };

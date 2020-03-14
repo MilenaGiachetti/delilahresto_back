@@ -37,7 +37,7 @@ module.exports = app => {
     /*-----------------DELETE A PRODUCT-----------------*/
     router.delete('/:id', middlewares.authorizateUser, products.deleteOne);
 
-    app.use('/products', router);
+    app.use('/productos', router);
 };
 
 
