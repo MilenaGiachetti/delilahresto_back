@@ -20,19 +20,19 @@ El proyecto también requiere tener instalado XAMPP o algún otro sistema de ges
 En XAMPP se debe tener activado los módulos Apache y MySQL para poder realizar operaciones con la base de datos. De tener otro sistema realizar una acción equivalente.
 
 ### 4- Instalación de base de datos:
-##### 4.0-Comando para crear la estructura de la base de datos y tablas: 
+#### 4.0-Comando para crear la estructura de la base de datos y tablas: 
 
 ```bash
 node app/db/0_db_structure.js
 ```
 
-##### 4.1-Comando para agregar 2 usuarios Admins: 
+#### 4.1-Comando para agregar 2 usuarios Admins: 
 
 ```bash
 node app/db/1_db_admin.js
 ```
 
-##### 4.2-Comando para agregar data inicial de usuarios, productos y pedidos (opcional): 
+#### 4.2-Comando para agregar data inicial de usuarios, productos y pedidos (opcional): 
 
 ```bash
 node app/db/2_db_seed.js
@@ -43,6 +43,48 @@ Para inicializar el servidor y poder comenzar a realizar consultas
 
 ```bash
 node server.js
+```
+
+## Instalación
+### Datos de Admins:
+Admin 1:
+
+```bash
+{
+    "user_id": 1,
+    "username": "HelianaMHenriquez",
+    "password": "HelianaPass"
+}
+```
+
+Admin 2:
+
+```bash
+{
+    "user_id": 2,
+    "username": "CarlosArroyo",
+    "password": "CarlosArroyoPass"
+}
+```
+### Datos de Usuarios NO admins (sólo existentes de haberse realizado el paso opcional 4.2):
+Usuario 1:
+
+```bash
+{
+    "user_id": 4,
+    "username": "Carmelo",
+    "password": "Carmelo"
+}
+```
+
+Usuario 2:
+
+```bash
+{
+    "user_id": 27,
+    "username": "Estelle",
+    "password": "Estelle"
+}
 ```
 
 ## Open API
