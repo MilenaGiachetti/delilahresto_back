@@ -16,7 +16,7 @@ exports.addOne = (req,res) => {
     req.body.phone      !== undefined ? '' : missingInfo.push(' phone');
     req.body.password   !== undefined ? '' : missingInfo.push(' password');
     
-    if (missingInfo === '') {
+    if (missingInfo == '') {
         let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
                             FROM users 
                             WHERE username = ? OR email = ?`;
@@ -69,13 +69,13 @@ exports.addOne = (req,res) => {
                 });
                 //sending error message
                 if (email > 0 && name > 0) {
-                    res.status(400).send(`Error: ya existe un usuario con este nombre y email`);
+                    res.status(400).send(`Error: ya existe un usuario con este username y email`);
                 } else if (name > 0) {
-                    res.status(400).send(`Error: ya existe un usuario con este nombre`);
+                    res.status(400).send(`Error: ya existe un usuario con este username`);
                 } else if (email > 0) {
                     res.status(400).send(`Error: ya existe un usuario con este email`);
                 } else {
-                    res.status(400).send(`Error: ya existe un usuario con este nombre o email`);
+                    res.status(400).send(`Error: ya existe un usuario con este username o email`);
                 }
             }
         }).catch((err)=>{
