@@ -45,7 +45,7 @@ Para inicializar el servidor y poder comenzar a realizar consultas
 node server.js
 ```
 
-## Instalación
+## Información de usuarios Admins y NO Admins
 ### Datos de Admins:
 Admin 1:
 
