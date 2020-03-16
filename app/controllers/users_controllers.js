@@ -138,30 +138,68 @@ exports.updateOne = (req,res) => {
                 /*hashed password sent, if nothing is sent in the req.body.password it simply doesn't send it, so the password stays hashed as before*/
                 reqs.bcrypt.genSalt(reqs.saltRounds, function(err, salt) {
                     reqs.bcrypt.hash(req.body.password, salt, function(err, hash) {
-                        let current_user = result;
-                        /*Added conditional in case the request body doesnt send all the users information, in the case of a info not being given it sends the same info that was already in the db*/
-                        let changed_user = {
-                            user_id    : req.params.id,
-                            username   : req.body.username   !== undefined ? req.body.username   : current_user[0].username,
-                            firstname  : req.body.firstname  !== undefined ? req.body.firstname  : current_user[0].firstname,
-                            lastname   : req.body.lastname   !== undefined ? req.body.lastname   : current_user[0].lastname,
-                            email      : req.body.email      !== undefined ? req.body.email      : current_user[0].email,
-                            adress     : req.body.adress     !== undefined ? req.body.adress     : current_user[0].adress,
-                            phone      : req.body.phone      !== undefined ? req.body.phone      : current_user[0].phone,
-                            password   : req.body.password   !== undefined ? hash  : current_user[0].password,
-                            last_order : req.body.last_order !== undefined ? req.body.last_order : current_user[0].last_order,
-                            is_admin   : current_user[0].is_admin
-                        };
-                        let sql =  `UPDATE users SET username = :username, firstname = :firstname, lastname = :lastname, email = :email, adress = :adress, phone = :phone, password = :password, last_order = :last_order, is_admin = :is_admin
-                                    WHERE user_id = :user_id`;
-                        sequelize.query( sql, {
-                            replacements: changed_user
-                        }).then(result => {
-                            delete changed_user.password;
-                            res.json(changed_user);
-                        }).catch((err)=>{
-                            res.status(500).send( 'Error: ' + err );
-                        })           
+                        //created general function to update user
+                        function updateUser(){
+                            let current_user = result;
+                            /*Added conditional in case the request body doesnt send all the users information, in the case of a info not being given it sends the same info that was already in the db*/
+                            let changed_user = {
+                                user_id    : req.params.id,
+                                username   : req.body.username   !== undefined ? req.body.username   : current_user[0].username,
+                                firstname  : req.body.firstname  !== undefined ? req.body.firstname  : current_user[0].firstname,
+                                lastname   : req.body.lastname   !== undefined ? req.body.lastname   : current_user[0].lastname,
+                                email      : req.body.email      !== undefined ? req.body.email      : current_user[0].email,
+                                adress     : req.body.adress     !== undefined ? req.body.adress     : current_user[0].adress,
+                                phone      : req.body.phone      !== undefined ? req.body.phone      : current_user[0].phone,
+                                password   : req.body.password   !== undefined ? hash  : current_user[0].password,
+                                last_order : req.body.last_order !== undefined ? req.body.last_order : current_user[0].last_order,
+                                is_admin   : current_user[0].is_admin
+                            };
+                            let sql =  `UPDATE users SET username = :username, firstname = :firstname, lastname = :lastname, email = :email, adress = :adress, phone = :phone, password = :password, last_order = :last_order, is_admin = :is_admin
+                                        WHERE user_id = :user_id`;
+                            sequelize.query( sql, {
+                                replacements: changed_user
+                            }).then(result => {
+                                delete changed_user.password;
+                                res.json(changed_user);
+                            }).catch((err)=>{
+                                res.status(500).send( 'Error: ' + err );
+                            })           
+                        }
+
+                        //repetead username or email validation - only if new email or username info is sent
+                        if(req.body.username !== undefined || req.body.email !== undefined){
+                            let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
+                            FROM users 
+                            WHERE (username = ? OR email = ?) AND user_id != ?`;
+                            sequelize.query( sql, {
+                                replacements: [req.body.username, req.body.email, req.params.id], type:sequelize.QueryTypes.SELECT
+                            }).then(repeated_user => {
+                                //error message in case of repeated username or email
+                                if (repeated_user.length !== 0) {
+                                    let email = false;
+                                    let username = false;
+                                    for ( let i = 0; i < repeated_user.length; i++ ){
+                                        if ( repeated_user[i].username === req.body.username ) { username = true }
+                                        if ( repeated_user[i].email === req.body.email ) { email = true }
+                                    }
+                                    if ( email === true && username === true ){
+                                        res.status(400).send('Error: ya existe un usuario registrado con el username: ' + req.body.username + ' y el email: ' + req.body.email )
+                                    } else if ( email === true ) {
+                                        res.status(400).send('Error: ya existe un usuario registrado con el email: ' + req.body.email )
+                                    } else {
+                                        res.status(400).send('Error: ya existe un usuario registrado con el username: ' + req.body.username )
+                                    }
+                                //if not repeated update user
+                                } else {
+                                    updateUser();
+                                }
+                            }).catch((err)=>{
+                                res.status(500).send( 'Error: ' + err );
+                            })
+                        } else {
+                            //if not email or username info sent user updated without the extra query
+                            updateUser();
+                        }
                     });
                 });
             } else {
