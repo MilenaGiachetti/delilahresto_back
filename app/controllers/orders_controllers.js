@@ -180,24 +180,24 @@ exports.findAll = (req, res) => {
 }
 
 /*-----------------SEE ALL ORDERS SORTED BY ORDER_STATE o HOUR-----------------*/
-/*exports.findAllSorted = (req, res) => {
-    console.log(req.params.sort_direction);
+exports.findAllSorted = (req, res) => {
+    console.log(req.query.order_by );
     let sql =  `SELECT * FROM orders 
                 INNER JOIN products_orders ON products_orders.order_id = orders.order_id 
                 INNER JOIN products ON products_orders.product_id = products.product_id
                 ORDER BY orders.`;
-    sql +=  req.params.column_name === 'hour' && req.params.sort_direction === 'ASC'  
-            ? `date DESC, orders.hour`: 
-            req.params.column_name === 'hour' && req.params.sort_direction === 'DESC'  
-            ? `date DESC, orders.hour`: 
-            req.params.column_name === 'order_state' && req.params.sort_direction === 'ASC' 
+    sql +=  req.query.order_by === 'hour' && req.query.sort_direction === 'ASC'  
+            ? `date DESC, orders.hour ASC`: 
+            req.query.order_by === 'hour' && req.query.sort_direction === 'DESC'  
+            ? `date DESC, orders.hour DESC`: 
+            req.query.order_by  === 'order_state' && req.query.sort_direction === 'ASC' 
             ? `order_state ASC`:
-            req.params.column_name === 'order_state' && req.params.sort_direction === 'DESC' 
+            req.query.order_by  === 'order_state' && req.query.sort_direction === 'DESC' 
             ? `order_state DESC`:
             'error';
     if (sql.includes('error') === false) {
         sequelize.query( sql, {
-            replacements: [req.params.column_name],type:sequelize.QueryTypes.SELECT
+            type:sequelize.QueryTypes.SELECT
         }).then(all_orders => {
             if (all_orders.length === 0) {
                 res.status(404).send(`Error: no hay ningún pedido en la base de datos`);
@@ -251,9 +251,9 @@ exports.findAll = (req, res) => {
             res.status(500).send( 'Error: ' + err );
         })
     } else {
-        res.status(400).send('Error: valor de uno o ambos de los parámetros es incorrecto');
+        res.status(400).send('Error: valor de uno o ambos de los queries enviados es incorrecto');
     }
-}*/
+}
 
 
 /*-----------------SEE A ORDER-----------------*/

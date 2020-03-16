@@ -23,7 +23,7 @@ module.exports = app => {
     router.get('/', middlewares.authenticateUser, orders.findAll);
 
     /*-----------------SEE ALL ORDERS SORTED BY ORDER_STATE o HOUR-----------------*/
-    //router.get('/sortby=:column_name.:sort_direction', middlewares.authorizateUser, orders.findAllSorted);
+    router.get('/sort', middlewares.authorizateUser, orders.findAllSorted);
 
     /*-----------------SEE A ORDER-----------------*/
     router.get('/:id', middlewares.authenticateUser, orders.findOne);
