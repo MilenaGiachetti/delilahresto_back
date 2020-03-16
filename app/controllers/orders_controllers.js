@@ -163,6 +163,83 @@ exports.findAll = (req, res) => {
     })
 }
 
+/*-----------------SEE ALL ORDERS SORTED BY ORDER_STATE o HOUR-----------------*/
+/*exports.findAllSorted = (req, res) => {
+    console.log(req.params.sort_direction);
+    let sql =  `SELECT * FROM orders 
+                INNER JOIN products_orders ON products_orders.order_id = orders.order_id 
+                INNER JOIN products ON products_orders.product_id = products.product_id
+                ORDER BY orders.`;
+    sql +=  req.params.column_name === 'hour' && req.params.sort_direction === 'ASC'  
+            ? `date ASC, orders.hour`: 
+            req.params.column_name === 'hour' && req.params.sort_direction === 'DESC'  
+            ? `date DESC, orders.hour`: 
+            req.params.column_name === 'order_state' && req.params.sort_direction === 'ASC' 
+            ? `order_state ASC`:
+            req.params.column_name === 'order_state' && req.params.sort_direction === 'DESC' 
+            ? `order_state DESC`:
+            'error';
+    if (sql.includes('error') === false) {
+        sequelize.query( sql, {
+            replacements: [req.params.column_name],type:sequelize.QueryTypes.SELECT
+        }).then(all_orders => {
+            if (all_orders.length === 0) {
+                res.status(404).send(`Error: no hay ningún pedido en la base de datos`);
+            } else {
+                let orders = [];
+                let order;
+                let product;
+                function createProduct (i) {
+                    product = {
+                        product_quantity: all_orders[i].product_quantity,
+                        product_id: all_orders[i].product_id,
+                        product_name: all_orders[i].product_name,
+                        abbreviation: all_orders[i].abbreviation,
+                        link_img: all_orders[i].link_img,
+                        price:  all_orders[i].price
+                    }
+                }
+                function createOrder (i) {
+                    order = {
+                        order_id: all_orders[i].order_id,
+                        description: all_orders[i].description,
+                        payment: all_orders[i].payment,
+                        order_state: all_orders[i].order_state,
+                        date: all_orders[i].date,
+                        hour: all_orders[i].hour,
+                        total_price: all_orders[i].total_price,
+                        user_id: all_orders[i].user_id,
+                        products: []
+                    }
+                }
+                for (let i = 0; i < all_orders.length; i++){
+                    if (i === 0 || all_orders[i].order_id !== all_orders[i - 1].order_id){
+                        createOrder(i);
+                        createProduct(i);
+                        order.products.push(product);
+                        if (i === (all_orders.length - 1) || all_orders[i].order_id !== all_orders[i + 1].order_id) {
+                            orders.push(order);
+                        }
+                    } else if (i === (all_orders.length - 1) || all_orders[i].order_id !== all_orders[i + 1].order_id) { 
+                        createProduct(i);
+                        order.products.push(product);
+                        orders.push(order);
+                    } else {
+                        createProduct(i);
+                        order.products.push(product);
+                    }
+                }
+                res.json(orders);
+            }
+        }).catch((err)=>{
+            res.status(500).send( 'Error: ' + err );
+        })
+    } else {
+        res.status(400).send('Error: valor de uno o ambos de los parámetros es incorrecto');
+    }
+}*/
+
+
 /*-----------------SEE A ORDER-----------------*/
 exports.findOne = (req, res) => {
     let sql =  `SELECT *
