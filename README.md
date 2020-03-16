@@ -1,6 +1,7 @@
 # Delilah Resto Backend
 
 El Backend de Delilah Resto es el tercer proyecto del curso de Desarrollo Web Full Stack (DWFS) de Acámica.  
+
 Este proyecto se basa en el desarrollo de un backend para un restaurante ficticio utilizando NodeJS, Express y MySQL. Requiere un CRUD de usuarios, productos y ordenes, la posibilidad de que los usuarios puedan hacer un login y, relacionado a esto último, un sistema de autorización y autenticación de usuarios realizado con Json Web Tokens. 
 
 ## Instalación
@@ -14,23 +15,24 @@ Las dependencias son instaladas con el siguiente comando:
 npm install
 ```
 ### 3- XAMPP:
-El proyecto requiere tener instalado XAMPP o algún otro sistema de gestión de base de datos MySQL. Se lo puede descargar e instalar en [https://www.apachefriends.org/es/index.html](https://www.apachefriends.org/es/index.html).
+El proyecto también requiere tener instalado XAMPP o algún otro sistema de gestión de base de datos MySQL. Se lo puede descargar e instalar en [https://www.apachefriends.org/es/index.html](https://www.apachefriends.org/es/index.html).  
+
 En XAMPP se debe tener activado los módulos Apache y MySQL para poder realizar operaciones con la base de datos. De tener otro sistema realizar una acción equivalente.
 
 ### 4- Instalación de base de datos:
-0-Para crear la estructura de la base de datos y tablas: 
+##### 4.0-Comando para crear la estructura de la base de datos y tablas: 
 
 ```bash
 node app/db/0_db_structure.js
 ```
 
-1-Para agregar 2 usuarios Admins: 
+##### 4.1-Comando para agregar 2 usuarios Admins: 
 
 ```bash
 node app/db/1_db_admin.js
 ```
 
-2-Para agregar data inicial de usuarios, productos y pedidos (opcional): 
+##### 4.2-Comando para agregar data inicial de usuarios, productos y pedidos (opcional): 
 
 ```bash
 node app/db/2_db_seed.js
