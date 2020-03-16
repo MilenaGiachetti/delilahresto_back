@@ -4,25 +4,36 @@ const sequelize = require('../config/db_config');
 /*---------------------------------------------PRODUCTS--------------------------------------------*/
 /*-----------------ADD A PRODUCT-----------------*/
 exports.addOne = (req,res) => {
-    let new_product = {
-        product_name : req.body.product_name,
-        abbreviation : req.body.abbreviation,
-        link_img     : req.body.link_img,
-        price        : req.body.price
-    };
-    let sql =  `INSERT  INTO products 
-                        SET product_name = :product_name, 
-                            abbreviation = :abbreviation, 
-                            link_img     = :link_img, 
-                            price        = :price`;
-    sequelize.query( sql, {
-        replacements: new_product
-    }).then(result => {
-        new_product.product_id = result[0].insertId;
-        res.json(new_product);
-    }).catch((err)=>{
-        res.status(500).send( 'Error: ' + err );
-    })
+    //mensaje de error en caso de faltar info requerida 422 or 400?
+    let missingInfo = [];
+    req.body.product_name !== undefined ? '' : missingInfo.push(' product_name');
+    req.body.abbreviation  !== undefined ? '' : missingInfo.push(' abbreviation');
+    req.body.link_img   !== undefined ? '' : missingInfo.push(' link_img');
+    req.body.price      !== undefined ? '' : missingInfo.push(' price');
+    
+    if (missingInfo === '') {
+        let new_product = {
+            product_name : req.body.product_name,
+            abbreviation : req.body.abbreviation,
+            link_img     : req.body.link_img,
+            price        : req.body.price
+        };
+        let sql =  `INSERT  INTO products 
+                            SET product_name = :product_name, 
+                                abbreviation = :abbreviation, 
+                                link_img     = :link_img, 
+                                price        = :price`;
+        sequelize.query( sql, {
+            replacements: new_product
+        }).then(result => {
+            new_product.product_id = result[0].insertId;
+            res.json(new_product);
+        }).catch((err)=>{
+            res.status(500).send( 'Error: ' + err );
+        })
+    } else {
+        res.status(400).send('Error: falta la siguiente información requerida: '+ missingInfo);
+    }
 }
 
 /*-----------------SEE ALL PRODUCTS-----------------*/
