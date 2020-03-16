@@ -53,20 +53,7 @@ let dbsql = [
 
 sequelize.query( dbsql, {
     }).then(result => {
-        console.log('Base de datos y estructura de tablas creada con éxito')
+        console.log('Base de datos y estructura de tablas creadas con éxito')
     }).catch((err)=>{
         console.log( 'Error: ' + err );
 })
-
-
-
-
-
-                        /*
-let alterordersssql = `ALTER TABLE delilah_resto.orders
-                    MODIFY order_id int(64) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;`;
-let alterproductssql = `ALTER TABLE delilah_resto.products
-                    MODIFY product_id int(64) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;`;
-let alteruserssql = `ALTER TABLE delilah_resto.users
-                    MODIFY user_id int(64) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;`;
-*/
