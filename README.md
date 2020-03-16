@@ -11,7 +11,7 @@ Este proyecto se basa en el desarrollo de un backend para un restaurante fictici
 Este proyecto trabaja con Node.js, por ende, de no tenerlo instalado se lo debe instalar para el funcionamiento del proyecto. Se lo puede descargar e instalar en [https://nodejs.org/es/download/](https://nodejs.org/es/download/).
 
 ### 2- Instalación de paquetes:
-Las dependencias son instaladas con el siguiente comando:
+Las dependencias se instalan con el siguiente comando:
  
 ```bash
 npm install
@@ -37,7 +37,7 @@ node app/db/0_db_structure.js
 node app/db/1_db_admin.js
 ```
 
-#### 4.2-Comando para agregar data inicial de usuarios, productos y pedidos (opcional): 
+#### 4.2-Comando para agregar dummy data de usuarios, productos y pedidos (opcional): 
 
 ```bash
 node app/db/2_db_seed.js
@@ -96,4 +96,4 @@ Usuario 2:
    
    
 ## Open API
-Para ver más información referirse a la [documentación de la API](https://app.swaggerhub.com/apis/MilenaGiachetti/Delilah_Resto/1.0.0#/) o abrir archivo spec.yml
+Para ver más información referirse a la [documentación de la API](https://app.swaggerhub.com/apis/MilenaGiachetti/Delilah_Resto/1.0.0#/) o abrir archivo spec.yml del repositorio
