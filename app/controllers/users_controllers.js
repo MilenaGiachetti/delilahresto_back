@@ -215,13 +215,17 @@ exports.updateOne = (req,res) => {
 
 /*-----------------DELETE A USER-----------------*/
 exports.deleteOne = (req, res) => {
-    if(req.user[0].user_id == req.params.id){
+    if(req.user[0].user_id == req.params.id || req.user[0].is_admin === 'TRUE'){
         let sql =  `DELETE FROM users 
                     WHERE user_id = ?`;
         sequelize.query( sql, {
             replacements: [req.params.id]
         }).then(deleted_user => {
-            res.json(`Eliminado con éxito usuario con id: ${req.params.id}`);
+            if (deleted_user[0].affectedRows === 0){
+                res.status(404).send(`Error: usuario con id ${req.params.id} no existente`);
+            } else {
+                res.json(`Eliminado con éxito usuario con id: ${req.params.id}`);                
+            }
         }).catch((err)=>{
             res.status(500).send( 'Error: ' + err );
         })
