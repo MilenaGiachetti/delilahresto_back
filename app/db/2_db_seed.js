@@ -139,7 +139,7 @@ let dbsql = [
         (14, 7, 4, 28),
         (14, 36, 8, 28),
         (15, 16, 2, 6);`
-        
+    
 ].join(' ');
 
 sequelize.query( dbsql, {
