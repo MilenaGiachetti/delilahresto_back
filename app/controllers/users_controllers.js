@@ -86,6 +86,88 @@ exports.addOne = (req,res) => {
     }
 }
 
+/*-----------------ADD AN ADMIN-----------------*/
+exports.addAdmin = (req,res) => {
+    //mensaje de error en caso de faltar info requerida 422 or 400?
+    let missingInfo = [];
+    req.body.username   !== undefined ? '' : missingInfo.push(' username');
+    req.body.firstname  !== undefined ? '' : missingInfo.push(' firstname');
+    req.body.lastname   !== undefined ? '' : missingInfo.push(' lastname');
+    req.body.email      !== undefined ? '' : missingInfo.push(' email');
+    req.body.adress     !== undefined ? '' : missingInfo.push(' adress');
+    req.body.phone      !== undefined ? '' : missingInfo.push(' phone');
+    req.body.password   !== undefined ? '' : missingInfo.push(' password');
+    
+    if (missingInfo == '') {
+        let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
+                            FROM users 
+                            WHERE username = ? OR email = ?`;
+        sequelize.query( sql, {
+            replacements: [req.body.username, req.body.email], type:sequelize.QueryTypes.SELECT
+        }).then(repeated_user => {
+            if (repeated_user.length === 0) {
+                /*hashing password before sending information*/
+                reqs.bcrypt.genSalt(reqs.saltRounds, function(err, salt) {
+                    reqs.bcrypt.hash(req.body.password, salt, function(err, hash) {
+                        let user = {
+                            user_id    : null,
+                            username   : req.body.username,
+                            firstname  : req.body.firstname,
+                            lastname   : req.body.lastname,
+                            email      : req.body.email,
+                            adress     : req.body.adress,
+                            phone      : req.body.phone,
+                            password   : hash,
+                            last_order : 0,
+                            is_admin   : 'TRUE'
+                        };
+                        let sql = `INSERT INTO users VALUES (:user_id, :username, :firstname, :lastname, :email, :adress, :phone, :password, :last_order, :is_admin)`;
+                        sequelize.query( sql, {
+                            replacements: user
+                        }).then(result => {
+                            user.user_id = result[0];
+                            delete user.password;
+                            res.json(user);
+                            /*it should also return the token so it can be already logged in ?*/
+                        }).catch((err)=>{
+                            res.status(500).send( 'Error: ' + err );
+                        })
+                    });
+                });
+            } else {
+                //error handling when there is/are repeated username and/or email
+                let email = 0;
+                let name = 0;
+                //checking what is repeated
+                repeated_user.forEach(oneUser => {
+                    if (oneUser.username === req.body.username && oneUser.email === req.body.email) {
+                        email++;
+                        name++;
+                    } else if (oneUser.username === req.body.username) {
+                        name++;
+                    } else if (oneUser.email === req.body.email) {
+                        email++;
+                    } 
+                });
+                //sending error message
+                if (email > 0 && name > 0) {
+                    res.status(400).send(`Error: ya existe un usuario con este username y email`);
+                } else if (name > 0) {
+                    res.status(400).send(`Error: ya existe un usuario con este username`);
+                } else if (email > 0) {
+                    res.status(400).send(`Error: ya existe un usuario con este email`);
+                } else {
+                    res.status(400).send(`Error: ya existe un usuario con este username o email`);
+                }
+            }
+        }).catch((err)=>{
+            res.status(500).send( 'Error: ' + err );
+        })
+    } else {
+        res.status(400).send('Error: falta la siguiente información requerida: '+ missingInfo);
+    }
+}
+
 /*-----------------SEE ALL USERS-----------------*/
 exports.findAll = (req,res) => {
     let sql = `SELECT user_id, username, firstname, lastname, email, adress, phone FROM users WHERE is_admin = 'FALSE'`;
