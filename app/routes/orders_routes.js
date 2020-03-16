@@ -20,7 +20,7 @@ module.exports = app => {
     }*/
 
     /*-----------------SEE ALL ORDERS-----------------*/
-    router.get('/', middlewares.authorizateUser, orders.findAll);
+    router.get('/', middlewares.authenticateUser, orders.findAll);
 
     /*-----------------SEE ALL ORDERS SORTED BY ORDER_STATE o HOUR-----------------*/
     //router.get('/sortby=:column_name.:sort_direction', middlewares.authorizateUser, orders.findAllSorted);
