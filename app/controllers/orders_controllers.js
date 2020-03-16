@@ -9,91 +9,101 @@ exports.addOne = (req,res) => {
     -make the order total payment (I dont know if this is needed because the client should know before this info is sent to the back-end)
     -make array of objects to send to the join db products_orders
     */
-    let description = "";
-    let products_order = [];
-    let total_price = 0;
-    async function get(){
-        let total_product_quantity = req.body.products.length;
-        let product_number = 0;
-        for(let i = 0; i < total_product_quantity; i++){
-            let current_product_id = req.body.products[i].product_id;
-            let current_product_quantity =req.body.products[i].product_quantity;
-            
-            let sql = `SELECT * FROM products WHERE product_id = ?`;
-            await sequelize.query( sql, {
-                replacements: [current_product_id], type:sequelize.QueryTypes.SELECT
-            }).then(result => {
-                if( result[0] === undefined ) {
-                    res.status(404).send('Error: uno o más de los productos enviados en el pedido no existen');
-                } else {
-                    product_number += 1;
-                    description += current_product_quantity + "x" + result[0].abbreviation + " ";
-                    total_price += current_product_quantity*(+result[0].price);
-                    products_order.push({
-                        "product_id"       : current_product_id,
-                        "product_quantity" : current_product_quantity,
-                        "user_id"          : req.user[0].user_id
-                    })
-                    /*Checking for the last iteration so the info can be sent to be inserted in the order and products_orders tables */
-                    if(product_number === total_product_quantity){
-                        insert(products_order, description, total_price);
-                    }
-                }
-            }).catch((err)=>{
-                res.status(500).send( 'Error: ' + err );
-            })
-        };
-    }
-    get();
-    function insert(products_order, description, total_price){
-        let order = {
-            description : description,
-            payment     : req.body.payment,
-            order_state : 'nuevo',
-            total_price : total_price,
-            user_id     : req.user[0].user_id
-        };
-        let sql = `INSERT INTO orders
-                   SET description = :description, payment = :payment, order_state = :order_state, total_price= :total_price, user_id = :user_id`;
-        sequelize.query( sql, {
-            replacements: order
-        }).then(result => {
-            let changed_user = {
-                user_id    : req.user[0].user_id,
-                username   : req.user[0].username,
-                firstname  : req.user[0].firstname,
-                lastname   : req.user[0].lastname,
-                email      : req.user[0].email,
-                adress     : req.user[0].adress,
-                phone      : req.user[0].phone,
-                password   : req.user[0].password,
-                last_order : result[0],
-                is_admin   : req.user[0].is_admin
-            };
-            let sql =  `UPDATE users 
-                        SET user_id = :user_id, username = :username, firstname = :firstname, lastname = :lastname, email = :email, adress = :adress, phone = :phone, password = :password, last_order = :last_order, is_admin = :is_admin
-                        WHERE user_id = :user_id`;
-            sequelize.query( sql, {
-                replacements: changed_user
-            }).then((update_user_result) => {
-                products_order.forEach(product => {
-                    product["order_id"] = result[0];
-                    let sql =  `INSERT INTO products_orders 
-                                SET order_id= :order_id, product_id = :product_id, product_quantity = :product_quantity, user_id = :user_id`;
-                    sequelize.query( sql, {
-                        replacements: product
-                    }).catch((err) => {
+   if (req.body.payment === 'efectivo' || req.body.payment === 'credito' || req.body.payment === 'debito') {
+       if(req.body.payment === undefined || req.body.products === undefined || req.body.products[0] === undefined || req.body.products[0].product_id === undefined || req.body.products[0].product_quantity === undefined){
+            res.status(400).send( 'Error: información para creación de pedido faltante');
+        } else {
+            let description = "";
+            let products_order = [];
+            let total_price = 0;
+            async function get(){
+                let total_product_quantity = req.body.products.length;
+                let product_number = 0;
+                for(let i = 0; i < total_product_quantity; i++){
+                    let current_product_id = req.body.products[i].product_id;
+                    let current_product_quantity =req.body.products[i].product_quantity;
+                    
+                    let sql = `SELECT * FROM products WHERE product_id = ?`;
+                    await sequelize.query( sql, {
+                        replacements: [current_product_id], type:sequelize.QueryTypes.SELECT
+                    }).then(result => {
+                        if( result[0] === undefined ) {
+                            res.status(404).send('Error: uno o más de los productos enviados en el pedido no existen');
+                        } else if (isNaN(current_product_quantity)) {
+                            res.status(400).send('Error: uno o más de las cantidades de productos enviados en el pedido no es un número');
+                        }else {
+                            product_number += 1;
+                            description += current_product_quantity + "x" + result[0].abbreviation + " ";
+                            total_price += current_product_quantity*(+result[0].price);
+                            products_order.push({
+                                "product_id"       : current_product_id,
+                                "product_quantity" : current_product_quantity,
+                                "user_id"          : req.user[0].user_id
+                            })
+                            /*Checking for the last iteration so the info can be sent to be inserted in the order and products_orders tables */
+                            if(product_number === total_product_quantity){
+                                insert(products_order, description, total_price);
+                            }
+                        }
+                    }).catch((err)=>{
                         res.status(500).send( 'Error: ' + err );
                     })
+                };
+            }
+            get();
+            function insert(products_order, description, total_price){
+                let order = {
+                    description : description,
+                    payment     : req.body.payment,
+                    order_state : 'nuevo',
+                    total_price : total_price,
+                    user_id     : req.user[0].user_id
+                };
+                let sql = `INSERT INTO orders
+                        SET description = :description, payment = :payment, order_state = :order_state, total_price= :total_price, user_id = :user_id`;
+                sequelize.query( sql, {
+                    replacements: order
+                }).then(result => {
+                    let changed_user = {
+                        user_id    : req.user[0].user_id,
+                        username   : req.user[0].username,
+                        firstname  : req.user[0].firstname,
+                        lastname   : req.user[0].lastname,
+                        email      : req.user[0].email,
+                        adress     : req.user[0].adress,
+                        phone      : req.user[0].phone,
+                        password   : req.user[0].password,
+                        last_order : result[0],
+                        is_admin   : req.user[0].is_admin
+                    };
+                    let sql =  `UPDATE users 
+                                SET user_id = :user_id, username = :username, firstname = :firstname, lastname = :lastname, email = :email, adress = :adress, phone = :phone, password = :password, last_order = :last_order, is_admin = :is_admin
+                                WHERE user_id = :user_id`;
+                    sequelize.query( sql, {
+                        replacements: changed_user
+                    }).then((update_user_result) => {
+                        products_order.forEach(product => {
+                            product["order_id"] = result[0];
+                            let sql =  `INSERT INTO products_orders 
+                                        SET order_id= :order_id, product_id = :product_id, product_quantity = :product_quantity, user_id = :user_id`;
+                            sequelize.query( sql, {
+                                replacements: product
+                            }).catch((err) => {
+                                res.status(500).send( 'Error: ' + err );
+                            })
+                        })
+                        res.status(200).send({'message':'Pedido creado', 'order_id':result[0]});
+                    }).catch((err)=>{
+                        res.status(500).send( 'Error: ' + err );
+                    })
+                }).catch((err)=>{
+                    res.status(500).send( 'Error: ' + err );
                 })
-                res.status(200).send({'message':'Pedido creado', 'order_id':result[0]});
-            }).catch((err)=>{
-                res.status(500).send( 'Error: ' + err );
-            })
-        }).catch((err)=>{
-            res.status(500).send( 'Error: ' + err );
-        })
-    }
+            }
+       }
+   } else {
+       res.status(400).send('Error: valor de payment incorrecto');
+   }
 }
 
 /*-----------------SEE ALL ORDERS-----------------*/
