@@ -6,14 +6,14 @@ SET time_zone = "+00:00";
 CREATE DATABASE delilah_resto;
 
 CREATE TABLE `delilah_resto`.`orders` (
-  `order_id` int(11) NOT NULL,
+  `order_id` int(64) NOT NULL,
   `description` varchar(64) NOT NULL,
   `payment` enum('efectivo','credito','debito') NOT NULL,
   `order_state` enum('nuevo','confirmado','preparando','enviando','entregado','cancelado') NOT NULL DEFAULT 'nuevo',
   `date` date NOT NULL DEFAULT current_timestamp(),
   `hour` time NOT NULL DEFAULT current_timestamp(),
-  `total_price` int(6) NOT NULL,
-  `user_id` int(11) NOT NULL
+  `total_price` int(8) NOT NULL,
+  `user_id` int(64) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -37,11 +37,11 @@ INSERT INTO `delilah_resto`.`orders` (`order_id`, `description`, `payment`, `ord
 
 
 CREATE TABLE `delilah_resto`.`products` (
-  `product_id` int(11) NOT NULL,
+  `product_id` int(64) NOT NULL,
   `product_name` varchar(64) NOT NULL,
   `abbreviation` varchar(8) NOT NULL,
   `link_img` varchar(1000) NOT NULL,
-  `price` int(4) NOT NULL
+  `price` int(8) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `delilah_resto`.`products` (`product_id`, `product_name`, `abbreviation`, `link_img`, `price`) VALUES
@@ -93,10 +93,10 @@ INSERT INTO `delilah_resto`.`products` (`product_id`, `product_name`, `abbreviat
 (46, 'Agua mineral', 'Agua', 'https://images.unsplash.com/photo-1546498159-9a2fac87e770?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60', 60);
 
 CREATE TABLE `delilah_resto`.`products_orders` (
-  `order_id` int(11) NOT NULL,
-  `product_id` int(11) NOT NULL,
+  `order_id` int(64) NOT NULL,
+  `product_id` int(64) NOT NULL,
   `product_quantity` int(2) NOT NULL,
-  `user_id` int(11) NOT NULL
+  `user_id` int(64) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `delilah_resto`.`products_orders` (`order_id`, `product_id`, `product_quantity`, `user_id`) VALUES
@@ -137,7 +137,7 @@ INSERT INTO `delilah_resto`.`products_orders` (`order_id`, `product_id`, `produc
 (15, 16, 2, 6);
 
 CREATE TABLE `delilah_resto`.`users` (
-  `user_id` int(11) NOT NULL,
+  `user_id` int(64) NOT NULL,
   `username` varchar(64) NOT NULL,
   `firstname` varchar(64) NOT NULL,
   `lastname` varchar(64) NOT NULL,
@@ -145,7 +145,7 @@ CREATE TABLE `delilah_resto`.`users` (
   `adress` varchar(64) NOT NULL,
   `phone` int(16) NOT NULL,
   `password` varchar(64) NOT NULL,
-  `last_order` int(11) NOT NULL,
+  `last_order` int(64) NOT NULL,
   `is_admin` enum('FALSE','TRUE') NOT NULL DEFAULT 'FALSE'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -185,10 +185,11 @@ ALTER TABLE `delilah_resto`.`orders`
 
 ALTER TABLE `delilah_resto`.`products`
   ADD PRIMARY KEY (`product_id`);
+  ADD UNIQUE KEY (`product_name`,`abbreviation`);
 
 ALTER TABLE `delilah_resto`.`users`
   ADD PRIMARY KEY (`user_id`);
-
+  ADD UNIQUE KEY (`username`,`email`);
 
 ALTER TABLE `delilah_resto`.`orders`
   MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
