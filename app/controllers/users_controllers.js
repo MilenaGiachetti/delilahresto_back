@@ -45,10 +45,16 @@ exports.addOne = (req,res) => {
                         }).then(result => {
                             user.user_id = result[0];
                             delete user.password;
-                            res.json(user);
+                            res.status(200).json(user);
                             /*it should also return the token so it can be already logged in ?*/
                         }).catch((err)=>{
-                            res.status(500).send( 'Error: ' + err );
+                            res.status(500).json(
+                                {"error": 
+                                    {"status": "500",
+                                    "message": "Internal Server Error: " + err
+                                    }
+                                }
+                            )
                         })
                     });
                 });
@@ -69,20 +75,56 @@ exports.addOne = (req,res) => {
                 });
                 //sending error message
                 if (email > 0 && name > 0) {
-                    res.status(400).send(`Error: ya existe un usuario con este username y email`);
+                    res.status(400).json(
+                        {"error": 
+                            {"status": "400",
+                            "message": "user with this username and email already exists in our database"
+                            }
+                        }
+                    )
                 } else if (name > 0) {
-                    res.status(400).send(`Error: ya existe un usuario con este username`);
+                    res.status(400).json(
+                        {"error": 
+                            {"status": "400",
+                            "message": "user with this username already exists in our database"
+                            }
+                        }
+                    )
                 } else if (email > 0) {
-                    res.status(400).send(`Error: ya existe un usuario con este email`);
+                    res.status(400).json(
+                        {"error": 
+                            {"status": "400",
+                            "message": "user with this email already exists in our database"
+                            }
+                        }
+                    )
                 } else {
-                    res.status(400).send(`Error: ya existe un usuario con este username o email`);
+                    res.status(400).json(
+                        {"error": 
+                            {"status": "400",
+                            "message": "user with this username or email already exists in our database"
+                            }
+                        }
+                    )
                 }
             }
         }).catch((err)=>{
-            res.status(500).send( 'Error: ' + err );
+            res.status(500).json(
+                {"error": 
+                    {"status": "500",
+                    "message": "Internal Server Error: " + err
+                    }
+                }
+            )
         })
     } else {
-        res.status(400).send('Error: falta la siguiente información requerida: '+ missingInfo);
+        res.status(400).json(
+            {"error": 
+                {"status": "400",
+                "message": "the request is missing the following information: " + missingInfo
+                }
+            }
+        )
     }
 }
 
@@ -127,10 +169,16 @@ exports.addAdmin = (req,res) => {
                         }).then(result => {
                             user.user_id = result[0];
                             delete user.password;
-                            res.json(user);
+                            res.status(200).json(user);
                             /*it should also return the token so it can be already logged in ?*/
                         }).catch((err)=>{
-                            res.status(500).send( 'Error: ' + err );
+                            res.status(500).json(
+                                {"error": 
+                                    {"status": "500",
+                                    "message": "Internal Server Error: " + err
+                                    }
+                                }
+                            )
                         })
                     });
                 });
@@ -151,20 +199,56 @@ exports.addAdmin = (req,res) => {
                 });
                 //sending error message
                 if (email > 0 && name > 0) {
-                    res.status(400).send(`Error: ya existe un usuario con este username y email`);
+                    res.status(400).json(
+                        {"error": 
+                            {"status": "400",
+                            "message": "user with this username and email already exists in our database"
+                            }
+                        }
+                    )
                 } else if (name > 0) {
-                    res.status(400).send(`Error: ya existe un usuario con este username`);
+                    res.status(400).json(
+                        {"error": 
+                            {"status": "400",
+                            "message": "user with this username already exists in our database"
+                            }
+                        }
+                    )
                 } else if (email > 0) {
-                    res.status(400).send(`Error: ya existe un usuario con este email`);
+                    res.status(400).json(
+                        {"error": 
+                            {"status": "400",
+                            "message": "user with this email already exists in our database"
+                            }
+                        }
+                    )
                 } else {
-                    res.status(400).send(`Error: ya existe un usuario con este username o email`);
+                    res.status(400).json(
+                        {"error": 
+                            {"status": "400",
+                            "message": "user with this username or email already exists in our database"
+                            }
+                        }
+                    )
                 }
             }
         }).catch((err)=>{
-            res.status(500).send( 'Error: ' + err );
+            res.status(500).json(
+                {"error": 
+                    {"status": "500",
+                    "message": "Internal Server Error: " + err
+                    }
+                }
+            )
         })
     } else {
-        res.status(400).send('Error: falta la siguiente información requerida: '+ missingInfo);
+        res.status(400).json(
+            {"error": 
+                {"status": "400",
+                "message": "the request is missing the following information: " + missingInfo
+                }
+            }
+        )
     }
 }
 
@@ -175,12 +259,24 @@ exports.findAll = (req,res) => {
         type:sequelize.QueryTypes.SELECT
     }).then(all_users => {
         if (all_users.length === 0) {
-            res.status(404).send(`Error: no existe ningún usuarios`)
+            res.status(404).json(
+                {"error": 
+                    {"status": "404",
+                    "message": "database doesn't have any non-admin user"
+                    }
+                }
+            )
         } else {
-            res.json(all_users);
+            res.status(200).json(all_users);
         }
     }).catch((err)=>{
-        res.status(500).send( 'Error: ' + err );
+        res.status(500).json(
+            {"error": 
+                {"status": "500",
+                "message": "Internal Server Error: " + err
+                }
+            }
+        )
     })
 }
 
@@ -194,15 +290,33 @@ exports.findOne = (req, res) => {
             replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
         }).then(user => {
             if (user.length === 0) {
-                res.status(404).send(`Error: no hay usuario con el id ${req.params.id}`)
+                res.status(404).json(
+                    {"error": 
+                        {"status":"404",
+                        "message":`user with the id ${req.params.id} doens't exist in our database.`
+                        }
+                    }
+                )
             } else {
-                res.json(user[0]);
+                res.status(200).json(user[0]);
             }
         }).catch((err)=>{
-            res.status(500).send( 'Error: ' + err );
+            res.status(500).json(
+                {"error": 
+                    {"status": "500",
+                    "message": "Internal Server Error: " + err
+                    }
+                }
+            )
         })
     } else {
-        res.status(403).send("Error: no se encuentra autorizado a ver esta información");
+        res.status(403).json(
+            {"error": 
+                {"status": "403",
+                "message": "user not authorized to see this information"
+                }
+            }
+        )
     }
 }
 
@@ -242,9 +356,15 @@ exports.updateOne = (req,res) => {
                                 replacements: changed_user
                             }).then(result => {
                                 delete changed_user.password;
-                                res.json(changed_user);
+                                res.status(200).json(changed_user);
                             }).catch((err)=>{
-                                res.status(500).send( 'Error: ' + err );
+                                res.status(500).json(
+                                    {"error": 
+                                        {"status": "500",
+                                        "message": "Internal Server Error: " + err
+                                        }
+                                    }
+                                )
                             })           
                         }
 
@@ -265,18 +385,42 @@ exports.updateOne = (req,res) => {
                                         if ( repeated_user[i].email === req.body.email ) { email = true }
                                     }
                                     if ( email === true && username === true ){
-                                        res.status(400).send('Error: ya existe un usuario registrado con el username: ' + req.body.username + ' y el email: ' + req.body.email )
+                                        res.status(400).json(
+                                            {"error": 
+                                                {"status": "400",
+                                                "message": "user with the username: "+ req.body.username + " and email: " + req.body.email + " already exists in our database"
+                                                }
+                                            }
+                                        )
                                     } else if ( email === true ) {
-                                        res.status(400).send('Error: ya existe un usuario registrado con el email: ' + req.body.email )
+                                        res.status(400).json(
+                                            {"error": 
+                                                {"status": "400",
+                                                "message": "user with the email: " + req.body.email + " already exists in our database"
+                                                }
+                                            }
+                                        )
                                     } else {
-                                        res.status(400).send('Error: ya existe un usuario registrado con el username: ' + req.body.username )
+                                        res.status(400).json(
+                                            {"error": 
+                                                {"status": "400",
+                                                "message": "user with the username: "+ req.body.username + " already exists in our database"
+                                                }
+                                            }
+                                        )
                                     }
                                 //if not repeated update user
                                 } else {
                                     updateUser();
                                 }
                             }).catch((err)=>{
-                                res.status(500).send( 'Error: ' + err );
+                                res.status(500).json(
+                                    {"error": 
+                                        {"status": "500",
+                                        "message": "Internal Server Error: " + err
+                                        }
+                                    }
+                                )
                             })
                         } else {
                             //if not email or username info sent user updated without the extra query
@@ -285,13 +429,31 @@ exports.updateOne = (req,res) => {
                     });
                 });
             } else {
-                res.status(404).send(`Error: no hay usuario con el id ${req.params.id}`)
+                res.status(404).json(
+                    {"error": 
+                        {"status":"404",
+                        "message":`user with the id ${req.params.id} doens't exist in our database.`
+                        }
+                    }
+                )
             }
         }).catch((err)=>{
-            res.status(500).send( 'Error: ' + err );
+            res.status(500).json(
+                {"error": 
+                    {"status": "500",
+                    "message": "Internal Server Error: " + err
+                    }
+                }
+            )
         })
     } else {
-        res.status(403).send("Error: no se encuentra autorizado para modificar esta información");
+        res.status(403).json(
+            {"error": 
+                {"status": "403",
+                "message": "user not authorized to see this information"
+                }
+            }
+        )
     }
 }
 
@@ -306,13 +468,25 @@ exports.deleteOne = (req, res) => {
             if (deleted_user[0].affectedRows === 0){
                 res.status(404).send(`Error: usuario con id ${req.params.id} no existente`);
             } else {
-                res.json(`Eliminado con éxito usuario con id: ${req.params.id}`);                
+                res.status(200).json(`Eliminado con éxito usuario con id: ${req.params.id}`);                
             }
         }).catch((err)=>{
-            res.status(500).send( 'Error: ' + err );
+            res.status(500).json(
+                {"error": 
+                    {"status": "500",
+                    "message": "Internal Server Error: " + err
+                    }
+                }
+            )
         })
     } else {
-        res.status(403).send("Error: no se encuentra autorizado para eliminar este usuario");
+        res.status(403).json(
+            {"error": 
+                {"status": "403",
+                "message": "user not authorized to delete this user"
+                }
+            }
+        )
     }
 }
 
@@ -334,13 +508,25 @@ exports.login = (req,res) => {
                 const token = reqs.jwt.sign({
                     user_id,
                 }, jwtPass);
-                res.json({token: token, user_id: user_id});
+                res.status(200).json({token: token, user_id: user_id});
             } else {
-                res.status(401).send('Error: Datos incorrectos');
+                res.status(401).json(
+                    {"error": 
+                        {"status": "401",
+                        "message": "user information sent is incorrect"
+                        }
+                    }
+                )
             }
         }
         checkPass();
     }).catch((err)=>{
-        res.status(500).send( 'Error: ' + err );
+        res.status(500).json(
+            {"error": 
+                {"status": "500",
+                "message": "Internal Server Error: " + err
+                }
+            }
+        )
     })
 }
