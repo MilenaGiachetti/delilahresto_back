@@ -283,7 +283,7 @@ exports.addAdmin = (req,res) => {
 
 /*-----------------SEE ALL USERS-----------------*/
 exports.findAll = (req,res) => {
-    let sql = `SELECT user_id, username, firstname, lastname, email, adress, phone FROM users`;
+    let sql = `SELECT user_id, username, firstname, lastname, email, adress, phone, last_order, is_admin FROM users`;
     sequelize.query( sql, {
         type:sequelize.QueryTypes.SELECT
     }).then(all_users => {
@@ -357,7 +357,7 @@ exports.updateOne = (req,res) => {
             return emailregex.test(email);
         }
         //check if is a valid email adress with regulaar expressions
-        if(validateEmail(req.body.email)){
+        if(req.body.email === undefined || validateEmail(req.body.email)){
             /*Search for the current user object*/
             let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, password, is_admin
                         FROM users 

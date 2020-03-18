@@ -157,7 +157,7 @@ exports.findOne = (req, res) => {
                 }
             )
         } else {
-            res.status(200).json(product);
+            res.status(200).json(product[0]);
         }
     }).catch((err)=>{
         res.status(500).json(

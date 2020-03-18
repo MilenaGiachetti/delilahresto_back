@@ -31,7 +31,7 @@ let dbsql = [
         (27, 'Estelle', 'Estelle', 'Wisoky', 'wisoky@company.org', '115 Elissa Lodge', 2147483647, '$2b$10$j7IvBqFrujcURpjI2p1TQOEyRXfxhhGcvjWxHJAwze6YYVqMSpFey', 8, 'FALSE'),
         (28, 'JediMaster', 'Luke', 'Skywalker', 'lukeskywalker@jedi.sw', '526 Tatooine', 1545879563, '$2b$10$t5n2/8XzmBGvryK2Mi8.j.VBJVCaqaNQzZDoZd4ifRDg.KUDAx/0q', 14, 'FALSE');`,
     `ALTER TABLE delilah_resto.users
-        MODIFY user_id int(64) NOT NULL, AUTO_INCREMENT=29;`,
+        MODIFY user_id int(64) AUTO_INCREMENT NOT NULL, AUTO_INCREMENT=29;`,
 
     `INSERT INTO delilah_resto.products (product_id, product_name, abbreviation, link_img, price) VALUES
         (1, 'Hamburguesa Veggie', 'HamVegg', 'https://images.unsplash.com/photo-1540265556701-ae209ac395cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60', 300),
@@ -81,7 +81,7 @@ let dbsql = [
         (45, 'Coca-Cola (500ml)', 'CocaBot', 'https://images.unsplash.com/flagged/photo-1567861248188-7f920f024c8c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 80),
         (46, 'Agua mineral', 'Agua', 'https://images.unsplash.com/photo-1546498159-9a2fac87e770?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60', 60);`,
     `ALTER TABLE delilah_resto.products
-        MODIFY product_id int(64) NOT NULL, AUTO_INCREMENT=47;`,
+        MODIFY product_id int(64) AUTO_INCREMENT NOT NULL, AUTO_INCREMENT=47;`,
     
     
     `INSERT INTO delilah_resto.orders (order_id, description, payment, order_state, date, hour, total_price, user_id) VALUES
@@ -101,7 +101,7 @@ let dbsql = [
         (14, '2xHamHon 2xHamBac 4xFritas 8xCervLat', 'credito', 'confirmado', '2020-03-18', '22:03:06', 2560, 28),
         (15, '2xTostPal', 'efectivo', 'nuevo', '2020-03-18', '22:06:47', 230, 6);`,
     `ALTER TABLE delilah_resto.orders
-        MODIFY order_id int(64) NOT NULL, AUTO_INCREMENT=16;`,
+        MODIFY order_id int(64) AUTO_INCREMENT NOT NULL, AUTO_INCREMENT=16;`,
 
     `INSERT INTO delilah_resto.products_orders (order_id, product_id, product_quantity, user_id) VALUES
         (1, 1, 1, 5),
