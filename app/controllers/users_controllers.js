@@ -262,7 +262,7 @@ exports.findAll = (req,res) => {
             res.status(404).json(
                 {"error": 
                     {"status": "404",
-                    "message": "database doesn't have any non-admin user"
+                    "message": "database doesn't have any non-admin user yet"
                     }
                 }
             )

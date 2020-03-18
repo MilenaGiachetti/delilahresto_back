@@ -34,9 +34,15 @@ exports.addOne = (req,res) => {
                     replacements: new_product
                 }).then(result => {
                     new_product.product_id = result[0].insertId;
-                    res.json(new_product);
+                    res.status(200).json(new_product);
                 }).catch((err)=>{
-                    res.status(500).send( 'Error: ' + err );
+                    res.status(500).json(
+                        {"error": 
+                            {"status": "500",
+                            "message": "Internal Server Error: " + err
+                            }
+                        }
+                    )
                 })
             } else {
                 //error handling when there is/are repeated product_name and/or abbreviation
@@ -55,20 +61,56 @@ exports.addOne = (req,res) => {
                 });
                 //sending error message
                 if (abbreviation > 0 && product_name > 0) {
-                    res.status(400).send(`Error: ya existe un producto con este product_name y abbreviation`);
+                    res.status(400).json(
+                        {"error": 
+                            {"status": "400",
+                            "message": "product with this product name and abbreviation already exists in our database" 
+                            }
+                        }
+                    )
                 } else if (product_name > 0) {
-                    res.status(400).send(`Error: ya existe un producto con este product_name`);
+                    res.status(400).json(
+                        {"error": 
+                            {"status": "400",
+                            "message": "product with this product name already exists in our database" 
+                            }
+                        }
+                    )
                 } else if (abbreviation > 0) {
-                    res.status(400).send(`Error: ya existe un producto con este abbreviation`);
+                    res.status(400).json(
+                        {"error": 
+                            {"status": "400",
+                            "message": "product with this abbreviation already exists in our database" 
+                            }
+                        }
+                    )
                 } else {
-                    res.status(400).send(`Error: ya existe un producto con este product_name o abbreviation`);
+                    res.status(400).json(
+                        {"error": 
+                            {"status": "400",
+                            "message": "product with this product name or abbreviation already exists in our database" 
+                            }
+                        }
+                    )
                 }
             }
         }).catch((err)=>{
-            res.status(500).send( 'Error: ' + err );
+            res.status(500).json(
+                {"error": 
+                    {"status": "500",
+                    "message": "Internal Server Error: " + err
+                    }
+                }
+            )
         })
     } else {
-        res.status(400).send('Error: falta la siguiente información requerida: '+ missingInfo);
+        res.status(400).json(
+            {"error": 
+                {"status": "400",
+                "message": "the request is missing the following information: " + missingInfo
+                }
+            }
+        )
     }
 }
 
@@ -79,12 +121,24 @@ exports.findAll = (req,res) => {
         replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(products => {
         if (products.length === 0) {
-            res.status(404).send("No hay productos en esta base de datos");
+            res.status(404).json(
+                {"error": 
+                    {"status": "404",
+                    "message": "database doesn't have any product yet"
+                    }
+                }
+            )
         } else {
-            res.json(products);
+            res.status(200).json(products);
         }
     }).catch((err)=>{
-        res.status(500).send( 'Error: ' + err );
+        res.status(500).json(
+            {"error": 
+                {"status": "500",
+                "message": "Internal Server Error: " + err
+                }
+            }
+        )
     })
 }
 
@@ -96,12 +150,24 @@ exports.findOne = (req, res) => {
         replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(product => {
         if (product.length === 0) {
-            res.status(404).send("Producto no existente");
+            res.status(404).json(
+                {"error": 
+                    {"status":"404",
+                    "message":`product with the id ${req.params.id} doens't exist in our database.`
+                    }
+                }
+            )
         } else {
-            res.json(product);
+            res.status(200).json(product);
         }
     }).catch((err)=>{
-        res.status(500).send( 'Error: ' + err );
+        res.status(500).json(
+            {"error": 
+                {"status": "500",
+                "message": "Internal Server Error: " + err
+                }
+            }
+        )
     })
 }
 
@@ -113,7 +179,13 @@ exports.updateOne = (req, res) => {
         replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(product => {
         if (product.length === 0) {
-            res.status(404).send("Producto no existente");
+            res.status(404).json(
+                {"error": 
+                    {"status":"404",
+                    "message":`product with the id ${req.params.id} doens't exist in our database.`
+                    }
+                }
+            )
         } else {
             function updateProduct () {
                 let current_product = product;
@@ -131,9 +203,15 @@ exports.updateOne = (req, res) => {
                 sequelize.query( sql, {
                     replacements: changed_product
                 }).then(update_result => {
-                    res.json(changed_product);
+                    res.status(200).json(changed_product);
                 }).catch((err)=>{
-                    res.status(500).send( 'Error: ' + err );
+                    res.status(500).json(
+                        {"error": 
+                            {"status": "500",
+                            "message": "Internal Server Error: " + err
+                            }
+                        }
+                    )
                 })
             }
 
@@ -163,24 +241,60 @@ exports.updateOne = (req, res) => {
                         });
                         //sending error message
                         if (abbreviation > 0 && product_name > 0) {
-                            res.status(400).send(`Error: ya existe un producto con este product_name y abbreviation`);
+                            res.status(400).json(
+                                {"error": 
+                                    {"status": "400",
+                                    "message": "product with this product name and abbreviation already exists in our database" 
+                                    }
+                                }
+                            )
                         } else if (product_name > 0) {
-                            res.status(400).send(`Error: ya existe un producto con este product_name`);
+                            res.status(400).json(
+                                {"error": 
+                                    {"status": "400",
+                                    "message": "product with this product name already exists in our database" 
+                                    }
+                                }
+                            )
                         } else if (abbreviation > 0) {
-                            res.status(400).send(`Error: ya existe un producto con este abbreviation`);
+                            res.status(400).json(
+                                {"error": 
+                                    {"status": "400",
+                                    "message": "product with this abbreviation already exists in our database" 
+                                    }
+                                }
+                            )
                         } else {
-                            res.status(400).send(`Error: ya existe un producto con este product_name o abbreviation`);
+                            res.status(400).json(
+                                {"error": 
+                                    {"status": "400",
+                                    "message": "product with this product name or abbreviation already exists in our database" 
+                                    }
+                                }
+                            )
                         }
                     }
                 }).catch((err)=>{
-                    res.status(500).send( 'Error: ' + err );
+                    res.status(500).json(
+                        {"error": 
+                            {"status": "500",
+                            "message": "Internal Server Error: " + err
+                            }
+                        }
+                    )
                 })
             } else {
                 updateProduct ();
             }
         }
     }).catch((err)=>{
-        res.status(500).send( 'Error: ' + err );
+        res.status(500).json(
+            {"error": 
+                {"status": "500",
+                "message": "Internal Server Error: " + err
+                }
+            }
+        )
     })
 }
 
@@ -192,11 +306,23 @@ exports.deleteOne = (req,res) => {
         replacements: [req.params.id]
     }).then(product => {
         if (product[0].affectedRows === 0) {
-            res.status(404).send("Error: Producto no existente");
+            res.status(404).json(
+                {"error": 
+                    {"status":"404",
+                    "message":`product with the id ${req.params.id} doens't exist in our database.`
+                    }
+                }
+            )
         } else {
-            res.json(`Eliminado con éxito producto con id: ${req.params.id}`);
+            res.status(200).json(`Eliminado con éxito producto con id: ${req.params.id}`);
         }
     }).catch((err)=>{
-        res.status(500).send( 'Error: ' + err );
+        res.status(500).json(
+            {"error": 
+                {"status": "500",
+                "message": "Internal Server Error: " + err
+                }
+            }
+        )
     })
 }
