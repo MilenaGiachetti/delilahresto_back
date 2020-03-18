@@ -25,6 +25,7 @@ Las dependencias se instalan con el siguiente comando:
 npm install
 ```  
   
+-Asegurarse que todos los comandos sean hechos con la carpeta raíz del proyecto como current directory  
 
 ### 3- XAMPP:
 El proyecto también requiere tener instalado XAMPP o algún otro sistema de gestión de base de datos MySQL. Se lo puede descargar e instalar en [https://www.apachefriends.org/es/index.html](https://www.apachefriends.org/es/index.html).  
