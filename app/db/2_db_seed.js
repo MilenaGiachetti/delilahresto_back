@@ -85,21 +85,21 @@ let dbsql = [
     
     
     `INSERT INTO delilah_resto.orders (order_id, description, payment, order_state, date, hour, total_price, user_id) VALUES
-        (1, '1xHamVegg 1xAgua', 'debito', 'entregado', '2020-03-02', '12:30:22', 360, 5),
-        (2, '1xTacCarn', 'efectivo', 'entregado', '2020-03-02', '12:45:32', 230, 4),
-        (3, '3xHamDob 2xCervLat 1xAgua', 'credito', 'cancelado', '2020-03-02', '13:20:18', 1350, 15),
-        (4, '2xTacPol 2xBebLim', 'debito', 'entregado', '2020-03-02', '13:26:15', 580, 11),
-        (5, '1xHamHon', 'efectivo', 'entregado', '2020-03-02', '14:52:16', 330, 7),
-        (6, '1xSandVegg 1xEnsCam 2xCheeChoc 1xCervBot', 'debito', 'entregado', '2020-03-02', '14:56:55', 840, 21),
-        (7, '1xEnsPast', 'efectivo', 'entregado', '2020-03-02', '15:02:55', 280, 24),
-        (8, '1xTacPic', 'efectivo', 'entregado', '2020-03-02', '15:33:06', 220, 27),
-        (9, '2xHamDob 1xHamVegg 2xNacVeg 6xCervLat', 'credito', 'entregado', '2020-03-02', '21:16:52', 2200, 4),
-        (10, '1xBagQue 1xTostHue 1xCheeAran 1xPieAran 2xBebMar', 'efectivo', 'entregado', '2020-03-03', '18:12:16', 665, 26),
-        (11, '1xPiePer 1xCheeMang 2xBebPom', 'debito', 'enviando', '2020-03-03', '21:33:59', 405, 13),
-        (12, '2xSandJam 2xCocaLat', 'debito', 'preparando', '2020-03-03', '21:45:02', 560, 3),
-        (13, '1xBagSalm', 'efectivo', 'confirmado', '2020-03-03', '21:59:32', 150, 5),
-        (14, '2xHamHon 2xHamBac 4xFritas 8xCervLat', 'credito', 'confirmado', '2020-03-03', '22:03:06', 2560, 28),
-        (15, '2xTostPal', 'efectivo', 'nuevo', '2020-03-03', '22:06:47', 230, 6);`,
+        (1, '1xHamVegg 1xAgua', 'debito', 'entregado', '2020-03-18', '12:30:22', 360, 5),
+        (2, '1xTacCarn', 'efectivo', 'entregado', '2020-03-18', '12:45:32', 230, 4),
+        (3, '3xHamDob 2xCervLat 1xAgua', 'credito', 'cancelado', '2020-03-18', '13:20:18', 1350, 15),
+        (4, '2xTacPol 2xBebLim', 'debito', 'entregado', '2020-03-18', '13:26:15', 580, 11),
+        (5, '1xHamHon', 'efectivo', 'entregado', '2020-03-18', '14:52:16', 330, 7),
+        (6, '1xSandVegg 1xEnsCam 2xCheeChoc 1xCervBot', 'debito', 'entregado', '2020-03-18', '14:56:55', 840, 21),
+        (7, '1xEnsPast', 'efectivo', 'entregado', '2020-03-18', '15:02:55', 280, 24),
+        (8, '1xTacPic', 'efectivo', 'entregado', '2020-03-18', '15:33:06', 220, 27),
+        (9, '2xHamDob 1xHamVegg 2xNacVeg 6xCervLat', 'credito', 'entregado', '2020-03-18', '21:16:52', 1900, 4),
+        (10, '1xBagQue 1xTostHue 1xCheeAran 1xPieAran 2xBebMar', 'efectivo', 'entregado', '2020-03-18', '21:22:16', 665, 26),
+        (11, '1xPiePer 1xCheeMang 2xBebPom', 'debito', 'enviando', '2020-03-18', '21:33:59', 425, 13),
+        (12, '2xSandJam 2xCocaLat', 'debito', 'preparando', '2020-03-18', '21:45:02', 560, 3),
+        (13, '1xBagSalm', 'efectivo', 'confirmado', '2020-03-18', '21:59:32', 150, 5),
+        (14, '2xHamHon 2xHamBac 4xFritas 8xCervLat', 'credito', 'confirmado', '2020-03-18', '22:03:06', 2560, 28),
+        (15, '2xTostPal', 'efectivo', 'nuevo', '2020-03-18', '22:06:47', 230, 6);`,
     `ALTER TABLE delilah_resto.orders
         MODIFY order_id int(64) NOT NULL, AUTO_INCREMENT=16;`,
 
@@ -133,13 +133,12 @@ let dbsql = [
         (11, 41, 2, 13),
         (12, 11, 2, 3),
         (12, 44, 2, 3),
-        (13, 13, 3, 5),
+        (13, 13, 1, 5),
         (14, 4, 2, 28),
         (14, 6, 2, 28),
         (14, 7, 4, 28),
         (14, 36, 8, 28),
         (15, 16, 2, 6);`
-    
 ].join(' ');
 
 sequelize.query( dbsql, {
