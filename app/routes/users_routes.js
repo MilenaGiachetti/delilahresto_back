@@ -40,7 +40,6 @@ module.exports = app => {
     router.get('/:id', middlewares.authenticateUser, users.findOne);
 
     /*-----------------UPDATE A USER-----------------*/
-    //need to check if email and username doesnt already exists
     router.put('/:id', middlewares.authenticateUser, users.updateOne);
 
     /*example of info to send in the body:
