@@ -314,7 +314,7 @@ exports.deleteOne = (req,res) => {
                 }
             )
         } else {
-            res.status(200).json(`Eliminado con éxito producto con id: ${req.params.id}`);
+            res.status(200).json(`Successfully delete product with the id: ${req.params.id}`);
         }
     }).catch((err)=>{
         res.status(500).json(

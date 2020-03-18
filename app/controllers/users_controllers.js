@@ -468,7 +468,7 @@ exports.deleteOne = (req, res) => {
             if (deleted_user[0].affectedRows === 0){
                 res.status(404).send(`Error: usuario con id ${req.params.id} no existente`);
             } else {
-                res.status(200).json(`Eliminado con éxito usuario con id: ${req.params.id}`);                
+                res.status(200).json(`Successfully deleted user with the id: ${req.params.id}`);                
             }
         }).catch((err)=>{
             res.status(500).json(
