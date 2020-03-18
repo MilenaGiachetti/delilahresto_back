@@ -240,7 +240,7 @@ exports.findAll = (req, res) => {
 }
 
 /*-----------------SEE ALL ORDERS SORTED BY ORDER_STATE o HOUR-----------------*/
-exports.findAllSorted = (req, res) => {
+/*exports.findAllSorted = (req, res) => {
     console.log(req.query.order_by );
     let sql =  `SELECT * FROM orders 
                 INNER JOIN products_orders ON products_orders.order_id = orders.order_id 
@@ -331,7 +331,7 @@ exports.findAllSorted = (req, res) => {
             }
         )
     }
-}
+}*/
 
 
 /*-----------------SEE A ORDER-----------------*/
