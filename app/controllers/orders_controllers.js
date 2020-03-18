@@ -37,7 +37,7 @@ exports.addOne = (req,res) => {
                             res.status(404).json(
                                 {"error": 
                                     {"status":"404",
-                                    "message":`one or more of the products sent doens't exist in our database.`
+                                    "message":`one or more of the products sent doesn't exist in our database.`
                                     }
                                 }
                             )

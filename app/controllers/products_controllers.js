@@ -4,7 +4,6 @@ const sequelize = require('../config/db_config');
 /*---------------------------------------------PRODUCTS--------------------------------------------*/
 /*-----------------ADD A PRODUCT-----------------*/
 exports.addOne = (req,res) => {
-    //mensaje de error en caso de faltar info requerida 422 or 400?
     let missingInfo = [];
     req.body.product_name !== undefined ? '' : missingInfo.push(' product_name');
     req.body.abbreviation !== undefined ? '' : missingInfo.push(' abbreviation');
