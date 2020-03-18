@@ -70,5 +70,5 @@ module.exports = app => {
         res.send(`Esta es una pagina que requiere autorizacion. Hola Admin!`);
     })*/
 
-    app.use('/usuarios', router);
+    app.use('/users', router);
 };

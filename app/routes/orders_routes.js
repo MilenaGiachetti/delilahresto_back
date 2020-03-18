@@ -39,5 +39,5 @@ module.exports = app => {
     /*-----------------DELETE A ORDER-----------------*/
     router.delete('/:id', middlewares.authorizateUser, orders.deleteOne);
  
-    app.use('/pedidos', router);
+    app.use('/orders', router);
 };
