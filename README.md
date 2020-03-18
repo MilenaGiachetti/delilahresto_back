@@ -39,6 +39,7 @@ En XAMPP se debe tener activado los módulos Apache y MySQL para poder realizar 
 ```bash
 node app/db/0_db_structure.js
 ```  
+-Tener en cuenta que si existe un base de datos llamada 'delilah_resto' será eliminada en este paso  
 
 #### 4.1-Comando para agregar 2 usuarios Admins: 
 
