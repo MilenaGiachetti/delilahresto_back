@@ -11,7 +11,13 @@ exports.addOne = (req,res) => {
     */
    if (req.body.payment === 'efectivo' || req.body.payment === 'credito' || req.body.payment === 'debito') {
        if(req.body.payment === undefined || req.body.products === undefined || req.body.products[0] === undefined || req.body.products[0].product_id === undefined || req.body.products[0].product_quantity === undefined){
-            res.status(400).send( 'Error: información para creación de pedido faltante');
+            res.status(400).json(
+                {"error": 
+                    {"status": "400",
+                    "message": "the request is missing information needed to create the order"
+                    }
+                }
+            )
         } else {
             let description = "";
             let products_order = [];
@@ -28,9 +34,21 @@ exports.addOne = (req,res) => {
                         replacements: [current_product_id], type:sequelize.QueryTypes.SELECT
                     }).then(result => {
                         if( result[0] === undefined ) {
-                            res.status(404).send('Error: uno o más de los productos enviados en el pedido no existen');
+                            res.status(404).json(
+                                {"error": 
+                                    {"status":"404",
+                                    "message":`one or more of the products sent doens't exist in our database.`
+                                    }
+                                }
+                            )
                         } else if (isNaN(current_product_quantity)) {
-                            res.status(400).send('Error: uno o más de las cantidades de productos enviados en el pedido no es un número');
+                            res.status(400).json(
+                                {"error": 
+                                    {"status":"400",
+                                    "message":"one or more of the product quantities sent is not a number"
+                                    }
+                                }
+                            )
                         }else {
                             product_number += 1;
                             description += current_product_quantity + "x" + result[0].abbreviation + " ";
@@ -46,7 +64,13 @@ exports.addOne = (req,res) => {
                             }
                         }
                     }).catch((err)=>{
-                        res.status(500).send( 'Error: ' + err );
+                        res.status(500).json(
+                            {"error": 
+                                {"status": "500",
+                                "message": "Internal Server Error: " + err
+                                }
+                            }
+                        )
                     })
                 };
             }
@@ -89,20 +113,44 @@ exports.addOne = (req,res) => {
                             sequelize.query( sql, {
                                 replacements: product
                             }).catch((err) => {
-                                res.status(500).send( 'Error: ' + err );
+                                res.status(500).json(
+                                    {"error": 
+                                        {"status": "500",
+                                        "message": "Internal Server Error: " + err
+                                        }
+                                    }
+                                )
                             })
                         })
-                        res.status(200).send({'message':'Pedido creado', 'order_id':result[0]});
+                        res.status(200).json({'message':'order created', 'order_id':result[0]});
                     }).catch((err)=>{
-                        res.status(500).send( 'Error: ' + err );
+                        res.status(500).json(
+                            {"error": 
+                                {"status": "500",
+                                "message": "Internal Server Error: " + err
+                                }
+                            }
+                        )
                     })
                 }).catch((err)=>{
-                    res.status(500).send( 'Error: ' + err );
+                    res.status(500).json(
+                        {"error": 
+                            {"status": "500",
+                            "message": "Internal Server Error: " + err
+                            }
+                        }
+                    )
                 })
             }
        }
    } else {
-       res.status(400).send('Error: valor de payment incorrecto');
+        res.status(400).json(
+            {"error": 
+                {"status": "400",
+                "message": "payment value is incorrect"
+                }
+            }
+        )
    }
 }
 
@@ -114,7 +162,13 @@ exports.findAll = (req, res) => {
             type:sequelize.QueryTypes.SELECT
         }).then(all_orders => {
             if (all_orders.length === 0) {
-                res.status(404).send(`Error: no hay ningún pedido en la base de datos`);
+                res.status(404).json(
+                    {"error": 
+                        {"status": "404",
+                        "message": "database doesn't have any order yet"
+                        }
+                    }
+                )
             } else {
                 let orders = [];
                 let order;
@@ -159,10 +213,16 @@ exports.findAll = (req, res) => {
                         order.products.push(product);
                     }
                 }
-                res.json(orders);
+                res.status(200).json(orders);
             }
         }).catch((err)=>{
-            res.status(500).send( 'Error: ' + err );
+            res.status(500).json(
+                {"error": 
+                    {"status": "500",
+                    "message": "Internal Server Error: " + err
+                    }
+                }
+            )
         })
     }
     if(req.user[0].is_admin === 'TRUE'){
@@ -200,7 +260,13 @@ exports.findAllSorted = (req, res) => {
             type:sequelize.QueryTypes.SELECT
         }).then(all_orders => {
             if (all_orders.length === 0) {
-                res.status(404).send(`Error: no hay ningún pedido en la base de datos`);
+                res.status(404).json(
+                    {"error": 
+                        {"status": "404",
+                        "message": "database doesn't have any order yet"
+                        }
+                    }
+                )
             } else {
                 let orders = [];
                 let order;
@@ -245,13 +311,25 @@ exports.findAllSorted = (req, res) => {
                         order.products.push(product);
                     }
                 }
-                res.json(orders);
+                res.status(200).json(orders);
             }
         }).catch((err)=>{
-            res.status(500).send( 'Error: ' + err );
+            res.status(500).json(
+                {"error": 
+                    {"status": "500",
+                    "message": "Internal Server Error: " + err
+                    }
+                }
+            )
         })
     } else {
-        res.status(400).send('Error: valor de uno o ambos de los queries enviados es incorrecto');
+        res.status(400).json(
+            {"error": 
+                {"status": "400",
+                "message": "one or both of the querie values sent is incorrect"
+                }
+            }
+        )
     }
 }
 
@@ -267,7 +345,13 @@ exports.findOne = (req, res) => {
         replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
     }).then(result_order => {
         if (result_order.length === 0) {
-            res.status(404).send("Error: Pedido no existente");
+            res.status(404).json(
+                {"error": 
+                    {"status": "404",
+                    "message": "database doesn't have any order with the id: " + req.params.id
+                    }
+                }
+            )
         } else {
             if(req.user[0].user_id === result_order[0].user_id || req.user[0].is_admin === 'TRUE'){
                 let order = {
@@ -292,13 +376,25 @@ exports.findOne = (req, res) => {
                     }
                     order.products.push(product);
                 }
-                res.json(order);
+                res.status(200).json(order);
             } else {
-                res.status(403).send("Error: no se encuentra autorizado para ver esta información");
+                res.status(403).json(
+                    {"error": 
+                        {"status": "403",
+                        "message": "user not authorized to see this information"
+                        }
+                    }
+                )
             }
         }
     }).catch((err)=>{
-        res.status(500).send( 'Error: ' + err );
+        res.status(500).json(
+            {"error": 
+                {"status": "500",
+                "message": "Internal Server Error: " + err
+                }
+            }
+        )
     })
 }
 
@@ -321,15 +417,33 @@ exports.updateOne = (req,res) => {
         }).then(order => {
             /* the order doenst exists or order_state was changed to the same value*/
             if (order[0].affectedRows === 0) {
-                res.status(400).send('Error: Orden no existente u orden ya poseía el valor dado de order_state');
+                res.status(400).json(
+                    {"error": 
+                        {"status": "400",
+                        "message": "order doesn't exist in our database or the order already had the order state value given in the request"
+                        }
+                    }
+                )
             } else {
-                res.json((`Cambiado con éxito estado de pedido con id ${req.params.id} a '${req.body.order_state}'`));
+                res.status(200).json((`Successfully changed state of the order with the id ${req.params.id} to '${req.body.order_state}'`));
             }
         }).catch((err)=>{
-            res.status(500).send( 'Error: ' + err );
+            res.status(500).json(
+                {"error": 
+                    {"status": "500",
+                    "message": "Internal Server Error: " + err
+                    }
+                }
+            )
         })
     } else {
-        res.status(400).send('Error: Ingrese un valor de order_state válido');
+        res.status(400).json(
+            {"error": 
+                {"status": "400",
+                "message": "order_state value sent is not valid"
+                }
+            }
+        )
     }
 }
 
@@ -344,7 +458,13 @@ exports.deleteOne = (req,res) => {
         replacements: [req.params.id]
     }).then((order_result) => {
         if (order_result[0].affectedRows === 0) {
-            res.status(404).send("Error: Pedido no existente");
+            res.status(404).json(
+                {"error": 
+                    {"status": "404",
+                    "message": "database doesn't have an order with the id: " + req.params.id
+                    }
+                }
+            )
         } else {
             /*Erased from user as last_order*/
             let sql =  `UPDATE users 
@@ -353,12 +473,24 @@ exports.deleteOne = (req,res) => {
             sequelize.query( sql, {
                 replacements: ['0', req.params.id]
             }).then(result => {
-                res.json('Eliminado con éxito pedido con id: ' + req.params.id);
+                res.status(200).json('Successfully deleted order with the id: ' + req.params.id);
             }).catch((err)=>{
-                res.status(500).send( 'Error: ' + err );
+                res.status(500).json(
+                    {"error": 
+                        {"status": "500",
+                        "message": "Internal Server Error: " + err
+                        }
+                    }
+                )
             })           
         }
     }).catch((err)=>{
-        res.status(500).send( 'Error: ' + err );
+        res.status(500).json(
+            {"error": 
+                {"status": "500",
+                "message": "Internal Server Error: " + err
+                }
+            }
+        )
     })
 }
