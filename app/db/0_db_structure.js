@@ -1,6 +1,10 @@
 /*---------------------------------------------REQUIREMENTS--------------------------------------------*/
-const sequelize = require('../config/db_config');
-
+const Sequelize   = require('sequelize');
+const sequelize   = new Sequelize('mysql://root:@localhost:3306/', {
+    dialectOptions: {
+        multipleStatements: true
+    }
+});
 
 /*---------------------------------------------CREATE DATABASE and TABLES--------------------------------------------*/
 let dbsql = [   
