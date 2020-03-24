@@ -29,8 +29,7 @@ let dbsql = [
         description varchar(64) NOT NULL,    
         payment enum('efectivo','credito','debito') NOT NULL,    
         order_state enum('nuevo','confirmado','preparando','enviando','entregado','cancelado') NOT NULL DEFAULT 'nuevo',    
-        date date NOT NULL DEFAULT current_timestamp(),    
-        hour time NOT NULL DEFAULT current_timestamp(),    
+        time timestamp NOT NULL DEFAULT current_timestamp(),      
         total_price int(8) NOT NULL,    
         user_id int(64) NOT NULL  
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,

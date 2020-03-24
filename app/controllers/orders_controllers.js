@@ -189,8 +189,7 @@ exports.findAll = (req, res) => {
                         description: all_orders[i].description,
                         payment: all_orders[i].payment,
                         order_state: all_orders[i].order_state,
-                        date: all_orders[i].date,
-                        hour: all_orders[i].hour,
+                        time: all_orders[i].time,
                         total_price: all_orders[i].total_price,
                         user_id: all_orders[i].user_id,
                         products: []
@@ -359,8 +358,7 @@ exports.findOne = (req, res) => {
                     description: result_order[0].description,
                     payment: result_order[0].payment,
                     order_state: result_order[0].order_state,
-                    date: result_order[0].date,
-                    hour: result_order[0].hour,
+                    time: result_order[0].time,
                     total_price: result_order[0].total_price,
                     user_id: result_order[0].user_id,
                     products: []
