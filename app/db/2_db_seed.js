@@ -1,9 +1,11 @@
 /*---------------------------------------------REQUIREMENTS--------------------------------------------*/
+const db_data     = require('../config/db_connection_data');
+
 const sequelize = require('../config/db_config');
 
 /*---------------------------------------------CREATE ADMINS USERS--------------------------------------------*/
 let dbsql = [ 
-    `INSERT INTO delilah_resto.users (user_id, username, firstname, lastname, email, adress, phone, password, last_order, is_admin) VALUES
+    `INSERT INTO ${db_data.conf_db_name}.users (user_id, username, firstname, lastname, email, adress, phone, password, last_order, is_admin) VALUES
         (3, 'JonnieBins', 'Jonas', 'Bins', 'jonbins@zoie.me', '3656 Watsica Forest', 1518432774, '$2b$10$kFViDKSpDnijo3icqvMIHuBIeyxe5V0kA1vWWvKEYxaaHDoKpy1nG', 12, 'FALSE'),
         (4, 'Carmelo', 'Marcelino', 'McKenzie', 'marcemc@lonnie.biz', '02362 Uriah Burgs', 1399367233, '$2b$10$BjWt4G5/Uzf.PoIWYcMjU.4GtltIqx4Ce5iSOuuvZCjGx9X3o9oKW', 9, 'FALSE'),
         (5, 'DaniH', 'Daniela', 'Hyatt', 'dani@ethelyn.tv', '05305 Hoeger Orchard', 2147483647, '$2b$10$wBC7KnYDeweEibF1fNSogeoaYPu4SYnwvxjK6p1j.YaJOmyT.IOw.', 13, 'FALSE'),
@@ -30,10 +32,10 @@ let dbsql = [
         (26, 'NickieNick', 'Nicholas', 'Huel', 'nickhuel@anothermail.edu', '733 Vandervort Meadows', 2147483647, '$2b$10$Fz9yIsyETwCS36KhcQFbTuvhzGsbvIrYIAkj1uErJ/xuWU6F57aPa', 10, 'FALSE'),
         (27, 'Estelle', 'Estelle', 'Wisoky', 'wisoky@company.org', '115 Elissa Lodge', 2147483647, '$2b$10$j7IvBqFrujcURpjI2p1TQOEyRXfxhhGcvjWxHJAwze6YYVqMSpFey', 8, 'FALSE'),
         (28, 'JediMaster', 'Luke', 'Skywalker', 'lukeskywalker@jedi.sw', '526 Tatooine', 1545879563, '$2b$10$t5n2/8XzmBGvryK2Mi8.j.VBJVCaqaNQzZDoZd4ifRDg.KUDAx/0q', 14, 'FALSE');`,
-    `ALTER TABLE delilah_resto.users
+    `ALTER TABLE ${db_data.conf_db_name}.users
         MODIFY user_id int(64) AUTO_INCREMENT NOT NULL, AUTO_INCREMENT=29;`,
 
-    `INSERT INTO delilah_resto.products (product_id, product_name, abbreviation, link_img, price) VALUES
+    `INSERT INTO ${db_data.conf_db_name}.products (product_id, product_name, abbreviation, link_img, price) VALUES
         (1, 'Hamburguesa Veggie', 'HamVegg', 'https://images.unsplash.com/photo-1540265556701-ae209ac395cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60', 300),
         (2, 'Hamburguesa Doble', 'HamDob', 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 370),
         (3, 'Hamburguesa Clásica', 'HamClas', 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 310),
@@ -80,11 +82,11 @@ let dbsql = [
         (44, 'Coca-Cola (330ml)', 'CocaLat', 'https://images.unsplash.com/photo-1571814582435-672b9e1df15d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 50),
         (45, 'Coca-Cola (500ml)', 'CocaBot', 'https://images.unsplash.com/flagged/photo-1567861248188-7f920f024c8c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 80),
         (46, 'Agua mineral', 'Agua', 'https://images.unsplash.com/photo-1546498159-9a2fac87e770?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60', 60);`,
-    `ALTER TABLE delilah_resto.products
+    `ALTER TABLE ${db_data.conf_db_name}.products
         MODIFY product_id int(64) AUTO_INCREMENT NOT NULL, AUTO_INCREMENT=47;`,
     
     
-    `INSERT INTO delilah_resto.orders (order_id, description, payment, order_state, date, hour, total_price, user_id) VALUES
+    `INSERT INTO ${db_data.conf_db_name}.orders (order_id, description, payment, order_state, date, hour, total_price, user_id) VALUES
         (1, '1xHamVegg 1xAgua', 'debito', 'entregado', '2020-03-18', '12:30:22', 360, 5),
         (2, '1xTacCarn', 'efectivo', 'entregado', '2020-03-18', '12:45:32', 230, 4),
         (3, '3xHamDob 2xCervLat 1xAgua', 'credito', 'cancelado', '2020-03-18', '13:20:18', 1350, 15),
@@ -100,10 +102,10 @@ let dbsql = [
         (13, '1xBagSalm', 'efectivo', 'confirmado', '2020-03-18', '21:59:32', 150, 5),
         (14, '2xHamHon 2xHamBac 4xFritas 8xCervLat', 'credito', 'confirmado', '2020-03-18', '22:03:06', 2560, 28),
         (15, '2xTostPal', 'efectivo', 'nuevo', '2020-03-18', '22:06:47', 230, 6);`,
-    `ALTER TABLE delilah_resto.orders
+    `ALTER TABLE ${db_data.conf_db_name}.orders
         MODIFY order_id int(64) AUTO_INCREMENT NOT NULL, AUTO_INCREMENT=16;`,
 
-    `INSERT INTO delilah_resto.products_orders (order_id, product_id, product_quantity, user_id) VALUES
+    `INSERT INTO ${db_data.conf_db_name}.products_orders (order_id, product_id, product_quantity, user_id) VALUES
         (1, 1, 1, 5),
         (1, 46, 1, 5),
         (2, 23, 1, 4),

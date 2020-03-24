@@ -18,5 +18,5 @@ module.exports = {
     bcrypt     : bcrypt,
     saltRounds : saltRounds,
     jwt        : jwt,
-    jwtPass    : jwtPass,
+    jwtPass    : jwtPass
 }
