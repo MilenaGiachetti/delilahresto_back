@@ -782,11 +782,7 @@ components:
           - enviando
           - entregado
           - cancelado
-        date:
-          type: string
-          format: date-time
-          readOnly: true
-        hour:
+        time:
           type: string
           format: date-time
           readOnly: true
