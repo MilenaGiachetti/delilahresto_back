@@ -33,28 +33,42 @@ El proyecto también requiere tener instalado XAMPP o algún otro sistema de ges
 En XAMPP se debe tener activado los módulos Apache y MySQL para poder realizar operaciones con la base de datos. De tener otro sistema realizar una acción equivalente.  
   
 
-### 4- Instalación de base de datos:  
-#### 4.0-Comando para crear la estructura de la base de datos y tablas: 
+### 4- Configuración datos de conexión con la base de datos:  
+Entrando al archivo **db_connection_data.js** dentro de **app/config** se pueden observar las siguientes variables para la configuración de la conexión:
+
+
+```json
+conf_db_name  : 'delilah_resto',  // database name
+conf_user     : 'root',           // user name
+conf_password : '',               // password
+conf_port     : '3306',           // port number
+```
+   
+Los valores de estas variables pueden ser modificados de ser necesario.
+
+
+### 5- Instalación de base de datos:  
+#### 5.0-Comando para crear la estructura de la base de datos y tablas: 
 
 ```bash
 node app/db/0_db_structure.js
 ```  
--Tener en cuenta que si existe un base de datos llamada 'delilah_resto' será eliminada en este paso  
+-Tener en cuenta que si ya existe un base de datos llamada 'delilah_resto' (o cómo la haya renombreado en el paso 4) será eliminada en este paso  
 
-#### 4.1-Comando para agregar 2 usuarios Admins: 
+#### 5.1-Comando para agregar 2 usuarios Admins: 
 
 ```bash
 node app/db/1_db_admin.js
 ```  
 
-#### 4.2-Comando para agregar dummy data de usuarios, productos y pedidos (opcional): 
+#### 5.2-Comando para agregar dummy data de usuarios, productos y pedidos (opcional): 
 
 ```bash
 node app/db/2_db_seed.js
 ```  
 
-### 5- Inicializar el servidor
-Para inicializar el servidor y poder comenzar a realizar consultas
+### 6- Inicializar el servidor
+Para inicializar el servidor y poder comenzar a realizar consultas:
 
 ```bash
 node server.js
@@ -65,7 +79,7 @@ node server.js
 ### Datos de Admins:
 Admin 1:
 
-```bash
+```json
 {
     "user_id": 1,
     "username": "HelianaMHenriquez",
@@ -75,7 +89,7 @@ Admin 1:
 
 Admin 2:
 
-```bash
+```json
 {
     "user_id": 2,
     "username": "CarlosArroyo",
@@ -83,10 +97,10 @@ Admin 2:
 }
 ```  
   
-### Datos de Usuarios NO admins (sólo existentes de haberse realizado el paso opcional 4.2):
+### Datos de Usuarios NO admins (sólo existentes de haberse realizado el paso opcional 5.2):
 Usuario 1:
 
-```bash
+```json
 {
     "user_id": 4,
     "username": "Carmelo",
@@ -96,7 +110,7 @@ Usuario 1:
 
 Usuario 2:
 
-```bash
+```json
 {
     "user_id": 27,
     "username": "Estelle",
@@ -106,4 +120,4 @@ Usuario 2:
    
    
 ## Open API
-Para ver más información referirse a la [documentación de la API](https://app.swaggerhub.com/apis/MilenaGiachetti/Delilah_Resto/1.0.0#/) o abrir archivo spec.yml del repositorio
+Para ver más información referirse a la [documentación de la API](https://app.swaggerhub.com/apis/MilenaGiachetti/Delilah_Resto/1.0.0#/) o abrir archivo **spec.yml** del repositorio
