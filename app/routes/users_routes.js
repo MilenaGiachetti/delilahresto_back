@@ -14,7 +14,7 @@ module.exports = app => {
         "firstname": "Luke",
         "lastname": "Skywalker",
         "email": "lukeskywalker@jedi.sw",
-        "adress": "526 Tatooine",
+        "address": "526 Tatooine",
         "phone": 1545879563,
         "password": "Luke"
     }
@@ -24,7 +24,7 @@ module.exports = app => {
         "firstname": "Leia",
         "lastname": "Organa",
         "email": "leiaorgana@kindajedi.sw",
-        "adress": "326 Alderaan",
+        "address": "326 Alderaan",
         "phone": 1512549563,
         "password": "Leia"
     }
@@ -46,7 +46,7 @@ module.exports = app => {
     {
         "username": "LukeSky",
         "firstname": "Luke",
-        "adress": "1528 Tatooine",
+        "address": "1528 Tatooine",
         "phone": 1545879563,
     }
     {

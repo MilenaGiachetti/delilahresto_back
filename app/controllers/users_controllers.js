@@ -26,15 +26,15 @@ exports.addOne = (req,res) => {
     req.body.firstname  !== undefined ? "" : missingInfo.push("firstname");
     req.body.lastname   !== undefined ? "" : missingInfo.push("lastname");
     req.body.email      !== undefined ? "" : missingInfo.push("email");
-    req.body.adress     !== undefined ? "" : missingInfo.push("adress");
+    req.body.address     !== undefined ? "" : missingInfo.push("address");
     req.body.phone      !== undefined ? "" : missingInfo.push("phone");
     req.body.password   !== undefined ? "" : missingInfo.push("password");
     
     if (missingInfo.length === 0) {
-        //check if is a valid email adress with regulaar expressions
+        //check if is a valid email address with regulaar expressions
         if(validateEmail(req.body.email)){
             let sql =  
-                `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
+                `SELECT username, firstname, lastname, email, address, phone, last_order, is_admin 
                 FROM users 
                 WHERE username = ? OR email = ?`;
             sequelize.query( sql, {
@@ -50,13 +50,13 @@ exports.addOne = (req,res) => {
                                 firstname  : req.body.firstname,
                                 lastname   : req.body.lastname,
                                 email      : req.body.email,
-                                adress     : req.body.adress,
+                                address     : req.body.address,
                                 phone      : req.body.phone,
                                 password   : hash,
                                 last_order : 0,
                                 is_admin   : 0
                             };
-                            let sql = `INSERT INTO users VALUES (:user_id, :username, :firstname, :lastname, :email, :adress, :phone, :password, :last_order, :is_admin)`;
+                            let sql = `INSERT INTO users VALUES (:user_id, :username, :firstname, :lastname, :email, :address, :phone, :password, :last_order, :is_admin)`;
                             sequelize.query( sql, {
                                 replacements: user
                             }).then(result => {
@@ -100,15 +100,15 @@ exports.addAdmin = (req,res) => {
     req.body.firstname  !== undefined ? "" : missingInfo.push("firstname");
     req.body.lastname   !== undefined ? "" : missingInfo.push("lastname");
     req.body.email      !== undefined ? "" : missingInfo.push("email");
-    req.body.adress     !== undefined ? "" : missingInfo.push("adress");
+    req.body.address     !== undefined ? "" : missingInfo.push("address");
     req.body.phone      !== undefined ? "" : missingInfo.push("phone");
     req.body.password   !== undefined ? "" : missingInfo.push("password");
     
     if (missingInfo.length === 0) {
-        //check if is a valid email adress with regulaar expressions
+        //check if is a valid email address with regulaar expressions
         if(validateEmail(req.body.email)){
             let sql =  
-                `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
+                `SELECT username, firstname, lastname, email, address, phone, last_order, is_admin 
                 FROM users 
                 WHERE username = ? OR email = ?`;
             sequelize.query( sql, {
@@ -124,13 +124,13 @@ exports.addAdmin = (req,res) => {
                                 firstname  : req.body.firstname,
                                 lastname   : req.body.lastname,
                                 email      : req.body.email,
-                                adress     : req.body.adress,
+                                address     : req.body.address,
                                 phone      : req.body.phone,
                                 password   : hash,
                                 last_order : 0,
                                 is_admin   : 1
                             };
-                            let sql = `INSERT INTO users VALUES (:user_id, :username, :firstname, :lastname, :email, :adress, :phone, :password, :last_order, :is_admin)`;
+                            let sql = `INSERT INTO users VALUES (:user_id, :username, :firstname, :lastname, :email, :address, :phone, :password, :last_order, :is_admin)`;
                             sequelize.query( sql, {
                                 replacements: user
                             }).then(result => {
@@ -168,7 +168,7 @@ exports.addAdmin = (req,res) => {
 
 /*-----------------SEE ALL USERS-----------------*/
 exports.findAll = (req,res) => {
-    let sql = `SELECT user_id, username, firstname, lastname, email, adress, phone, last_order, is_admin FROM users`;
+    let sql = `SELECT user_id, username, firstname, lastname, email, address, phone, last_order, is_admin FROM users`;
     sequelize.query( sql, {
         type:sequelize.QueryTypes.SELECT
     }).then(all_users => {
@@ -186,7 +186,7 @@ exports.findAll = (req,res) => {
 exports.findOne = (req, res) => {
     if(req.user[0].user_id == req.params.id || req.user[0].is_admin){
         let sql =  
-            `SELECT user_id, username, firstname, lastname, email, adress, phone, last_order, is_admin 
+            `SELECT user_id, username, firstname, lastname, email, address, phone, last_order, is_admin 
             FROM users 
             WHERE user_id = ?`;
         sequelize.query( sql, {
@@ -208,11 +208,11 @@ exports.findOne = (req, res) => {
 /*-----------------UPDATE A USER-----------------*/
 exports.updateOne = (req,res) => {
     if(req.user[0].user_id == req.params.id){
-        //check if is a valid email adress with regulaar expressions
+        //check if is a valid email address with regulaar expressions
         if(req.body.email === undefined || validateEmail(req.body.email)){
             /*Search for the current user object*/
             let sql =  
-                `SELECT username, firstname, lastname, email, adress, phone, last_order, password, is_admin
+                `SELECT username, firstname, lastname, email, address, phone, last_order, password, is_admin
                 FROM users 
                 WHERE user_id = ?`;
             sequelize.query( sql, {
@@ -232,14 +232,14 @@ exports.updateOne = (req,res) => {
                                     firstname  : req.body.firstname  !== undefined ? req.body.firstname  : current_user[0].firstname,
                                     lastname   : req.body.lastname   !== undefined ? req.body.lastname   : current_user[0].lastname,
                                     email      : req.body.email      !== undefined ? req.body.email      : current_user[0].email,
-                                    adress     : req.body.adress     !== undefined ? req.body.adress     : current_user[0].adress,
+                                    address     : req.body.address     !== undefined ? req.body.address     : current_user[0].address,
                                     phone      : req.body.phone      !== undefined ? req.body.phone      : current_user[0].phone,
                                     password   : req.body.password   !== undefined ? hash  : current_user[0].password,
                                     last_order : req.body.last_order !== undefined ? req.body.last_order : current_user[0].last_order,
                                     is_admin   : current_user[0].is_admin
                                 };
                                 let sql =  
-                                    `UPDATE users SET username = :username, firstname = :firstname, lastname = :lastname, email = :email, adress = :adress, phone = :phone, password = :password, last_order = :last_order, is_admin = :is_admin
+                                    `UPDATE users SET username = :username, firstname = :firstname, lastname = :lastname, email = :email, address = :address, phone = :phone, password = :password, last_order = :last_order, is_admin = :is_admin
                                     WHERE user_id = :user_id`;
                                 sequelize.query( sql, {
                                     replacements: changed_user
@@ -253,7 +253,7 @@ exports.updateOne = (req,res) => {
                             //repetead username or email validation - only if new email or username info is sent
                             if(req.body.username !== undefined || req.body.email !== undefined){
                                 let sql =  
-                                    `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
+                                    `SELECT username, firstname, lastname, email, address, phone, last_order, is_admin 
                                     FROM users 
                                     WHERE (username = ? OR email = ?) AND user_id != ?`;
                                 sequelize.query( sql, {

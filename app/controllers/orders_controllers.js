@@ -94,14 +94,14 @@ exports.addOne = (req,res) => {
                         firstname  : req.user[0].firstname,
                         lastname   : req.user[0].lastname,
                         email      : req.user[0].email,
-                        adress     : req.user[0].adress,
+                        address     : req.user[0].address,
                         phone      : req.user[0].phone,
                         password   : req.user[0].password,
                         last_order : result[0],
                         is_admin   : req.user[0].is_admin
                     };
                     let sql =  `UPDATE users 
-                                SET user_id = :user_id, username = :username, firstname = :firstname, lastname = :lastname, email = :email, adress = :adress, phone = :phone, password = :password, last_order = :last_order, is_admin = :is_admin
+                                SET user_id = :user_id, username = :username, firstname = :firstname, lastname = :lastname, email = :email, address = :address, phone = :phone, password = :password, last_order = :last_order, is_admin = :is_admin
                                 WHERE user_id = :user_id`;
                     sequelize.query( sql, {
                         replacements: changed_user

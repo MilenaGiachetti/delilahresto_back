@@ -52,7 +52,7 @@ let dbsql = [
         firstname varchar(64) NOT NULL,
         lastname varchar(64) NOT NULL,
         email varchar(64) NOT NULL UNIQUE KEY,
-        adress varchar(64) NOT NULL,
+        address varchar(64) NOT NULL,
         phone int(16) NOT NULL,
         password varchar(64) NOT NULL,
         last_order int(64) NOT NULL,

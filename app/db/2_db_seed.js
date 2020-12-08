@@ -5,7 +5,7 @@ const sequelize = require('../config/db_config');
 
 /*---------------------------------------------CREATE ADMINS USERS--------------------------------------------*/
 let dbsql = [ 
-    `INSERT INTO ${db_data.conf_db_name}.users (user_id, username, firstname, lastname, email, adress, phone, password, last_order, is_admin) VALUES
+    `INSERT INTO ${db_data.conf_db_name}.users (user_id, username, firstname, lastname, email, address, phone, password, last_order, is_admin) VALUES
         (3, 'JonnieBins', 'Jonas', 'Bins', 'jonbins@zoie.me', '3656 Watsica Forest', 1518432774, '$2b$10$kFViDKSpDnijo3icqvMIHuBIeyxe5V0kA1vWWvKEYxaaHDoKpy1nG', 12, 0),
         (4, 'Carmelo', 'Marcelino', 'McKenzie', 'marcemc@lonnie.biz', '02362 Uriah Burgs', 1399367233, '$2b$10$BjWt4G5/Uzf.PoIWYcMjU.4GtltIqx4Ce5iSOuuvZCjGx9X3o9oKW', 9, 0),
         (5, 'DaniH', 'Daniela', 'Hyatt', 'dani@ethelyn.tv', '05305 Hoeger Orchard', 2147483647, '$2b$10$wBC7KnYDeweEibF1fNSogeoaYPu4SYnwvxjK6p1j.YaJOmyT.IOw.', 13, 0),
