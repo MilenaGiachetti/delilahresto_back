@@ -282,7 +282,7 @@ exports.updateOne = (req,res) => {
                         });
                     });
                 } else {
-                    sendErrorStatus(res, 404, `User with the id ${req.params.id} doesn't exist in our database`, "NOT_EXIST");
+                    sendErrorStatus(res, 404, `User with the id ${req.params.id} doesn't exist`, "NOT_EXIST");
                 }
             }).catch((err)=>{
                 sendErrorStatus(res, 500, `Internal Server Error: ${err}`, "SERVER_ERROR");

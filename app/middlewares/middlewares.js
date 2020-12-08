@@ -1,6 +1,6 @@
 /*---------------------------------------------REQUIREMENTS--------------------------------------------*/
-const reqs = require('../config/config');
-const sequelize = require('../config/db_config');
+const reqs = require("../config/config");
+const sequelize = require("../config/db_config");
 
 /*-----------------JWT PASSWORD-----------------*/
 const jwtPass = reqs.jwtPass;
@@ -21,7 +21,7 @@ exports.authenticateUser = (req, res, next) => {
     if(req.headers.authorization === undefined){
         sendErrorStatus(res, 401, "User validation error, log in to use this resource", "NO_AUTH");
     } else {
-        const token = req.headers.authorization.split(' ')[1];
+        const token = req.headers.authorization.split(" ")[1];
         const verifiedToken = reqs.jwt.verify(token, jwtPass);
         let sql =  `SELECT user_id, username, firstname, lastname, email, address, phone, last_order, is_admin FROM users 
                     WHERE user_id = ?`;
@@ -45,7 +45,7 @@ exports.authorizateUser = (req, res, next) => {
     if(req.headers.authorization === undefined){
         sendErrorStatus(res, 401, "User validation error, log in to use this resource", "NO_AUTH");
     } else {
-        const token = req.headers.authorization.split(' ')[1];
+        const token = req.headers.authorization.split(" ")[1];
         const verifiedToken = reqs.jwt.verify(token, jwtPass);
         let sql =  
             `SELECT * FROM users 
