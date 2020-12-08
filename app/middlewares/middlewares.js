@@ -64,7 +64,7 @@ exports.authorizateUser = (req, res, next) => {
         const verifiedToken = reqs.jwt.verify(token, jwtPass);
         let sql =  `SELECT * FROM users 
                     WHERE user_id = ? 
-                    AND is_admin = 'TRUE'`;
+                    AND is_admin = 1`;
         sequelize.query( sql, {
             replacements: [verifiedToken.user_id], type:sequelize.QueryTypes.SELECT
         }).then(user => {

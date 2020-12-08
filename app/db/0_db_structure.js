@@ -56,13 +56,13 @@ let dbsql = [
         phone int(16) NOT NULL,
         password varchar(64) NOT NULL,
         last_order int(64) NOT NULL,
-        is_admin enum('FALSE','TRUE') NOT NULL DEFAULT 'FALSE'
+        is_admin tinyint(1) NOT NULL DEFAULT 0
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
 ].join(' ');
 
 sequelize.query( dbsql, {
     }).then(result => {
-        console.log('Base de datos y estructura de tablas creadas con éxito')
+        console.log('Database & table structures successfully created')
     }).catch((err)=>{
         console.log( 'Error: ' + err );
 })

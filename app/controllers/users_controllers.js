@@ -1,34 +1,46 @@
 /*---------------------------------------------REQUIREMENTS--------------------------------------------*/
-const sequelize = require('../config/db_config');
-const reqs = require('../config/config');
+const sequelize = require("../config/db_config");
+const reqs = require("../config/config");
 
+const validateEmail = (email) => {
+    let emailregex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return emailregex.test(email);
+}
+
+const sendErrorStatus = (res, status, message, code) => {
+    res.status(status).json({
+        "error":{
+            "status"  : status,
+            "message" : message,
+            "code"    : code
+            // add short code for easy recognition from front. Ex. Code: "MISSING_INFO", "INVALID_EMAIL", "NOT_EXIST", "SERVER_ERROR", "NO_AUTH", "INCORRECT_DATA", "REPEATED_DATA"
+        }
+    })
+};
 
 /*---------------------------------------------USERS--------------------------------------------*/
 /*-----------------ADD A USER-----------------*/
 exports.addOne = (req,res) => {
     let missingInfo = [];
-    req.body.username   !== undefined ? '' : missingInfo.push(' username');
-    req.body.firstname  !== undefined ? '' : missingInfo.push(' firstname');
-    req.body.lastname   !== undefined ? '' : missingInfo.push(' lastname');
-    req.body.email      !== undefined ? '' : missingInfo.push(' email');
-    req.body.adress     !== undefined ? '' : missingInfo.push(' adress');
-    req.body.phone      !== undefined ? '' : missingInfo.push(' phone');
-    req.body.password   !== undefined ? '' : missingInfo.push(' password');
+    req.body.username   !== undefined ? "" : missingInfo.push("username");
+    req.body.firstname  !== undefined ? "" : missingInfo.push("firstname");
+    req.body.lastname   !== undefined ? "" : missingInfo.push("lastname");
+    req.body.email      !== undefined ? "" : missingInfo.push("email");
+    req.body.adress     !== undefined ? "" : missingInfo.push("adress");
+    req.body.phone      !== undefined ? "" : missingInfo.push("phone");
+    req.body.password   !== undefined ? "" : missingInfo.push("password");
     
-    if (missingInfo == '') {
-        function validateEmail(email) {
-            let emailregex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            return emailregex.test(email);
-        }
+    if (missingInfo.length === 0) {
         //check if is a valid email adress with regulaar expressions
         if(validateEmail(req.body.email)){
-            let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
-                                FROM users 
-                                WHERE username = ? OR email = ?`;
+            let sql =  
+                `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
+                FROM users 
+                WHERE username = ? OR email = ?`;
             sequelize.query( sql, {
                 replacements: [req.body.username, req.body.email], type:sequelize.QueryTypes.SELECT
-            }).then(repeated_user => {
-                if (repeated_user.length === 0) {
+            }).then(repeated_users => {
+                if (repeated_users.length === 0) {
                     /*hashing password before sending information*/
                     reqs.bcrypt.genSalt(reqs.saltRounds, function(err, salt) {
                         reqs.bcrypt.hash(req.body.password, salt, function(err, hash) {
@@ -42,7 +54,7 @@ exports.addOne = (req,res) => {
                                 phone      : req.body.phone,
                                 password   : hash,
                                 last_order : 0,
-                                is_admin   : 'FALSE'
+                                is_admin   : 0
                             };
                             let sql = `INSERT INTO users VALUES (:user_id, :username, :firstname, :lastname, :email, :adress, :phone, :password, :last_order, :is_admin)`;
                             sequelize.query( sql, {
@@ -51,94 +63,32 @@ exports.addOne = (req,res) => {
                                 user.user_id = result[0];
                                 delete user.password;
                                 res.status(200).json(user);
-                                /*it should also return the token so it can be already logged in ?*/
+                                /*it could also return the token so it can be already logged in*/
                             }).catch((err)=>{
-                                res.status(500).json(
-                                    {"error": 
-                                        {"status": "500",
-                                        "message": "Internal Server Error: " + err
-                                        }
-                                    }
-                                )
+                                sendErrorStatus(res, 500, `Internal Server Error: ${err}`, "SERVER_ERROR");
                             })
                         });
                     });
                 } else {
                     //error handling when there is/are repeated username and/or email
-                    let email = 0;
-                    let name = 0;
+                    let email = false;
+                    let username = false;
                     //checking what is repeated
-                    repeated_user.forEach(oneUser => {
-                        if (oneUser.username === req.body.username && oneUser.email === req.body.email) {
-                            email++;
-                            name++;
-                        } else if (oneUser.username === req.body.username) {
-                            name++;
-                        } else if (oneUser.email === req.body.email) {
-                            email++;
-                        } 
+                    repeated_users.forEach(repeated_user => {
+                        email = (repeated_user.email === req.body.email ? true : email);
+                        username = (repeated_user.username === req.body.username ? true : username);
                     });
                     //sending error message
-                    if (email > 0 && name > 0) {
-                        res.status(400).json(
-                            {"error": 
-                                {"status": "400",
-                                "message": "user with this username and email already exists in our database"
-                                }
-                            }
-                        )
-                    } else if (name > 0) {
-                        res.status(400).json(
-                            {"error": 
-                                {"status": "400",
-                                "message": "user with this username already exists in our database"
-                                }
-                            }
-                        )
-                    } else if (email > 0) {
-                        res.status(400).json(
-                            {"error": 
-                                {"status": "400",
-                                "message": "user with this email already exists in our database"
-                                }
-                            }
-                        )
-                    } else {
-                        res.status(400).json(
-                            {"error": 
-                                {"status": "400",
-                                "message": "user with this username or email already exists in our database"
-                                }
-                            }
-                        )
-                    }
+                    sendErrorStatus(res, 400, `${email && username ? "Username and email" : (email ? "Email" : "Username")} already exists`, "REPEATED_DATA");                 
                 }
             }).catch((err)=>{
-                res.status(500).json(
-                    {"error": 
-                        {"status": "500",
-                        "message": "Internal Server Error: " + err
-                        }
-                    }
-                )
+                sendErrorStatus(res, 500, `Internal Server Error: ${err}`, "SERVER_ERROR");
             })
         } else {
-            res.status(400).json(
-                {"error": 
-                    {"status": "400",
-                    "message": "email adress sent in the request is not valid"
-                    }
-                }
-            )
+            sendErrorStatus(res, 400, "Invalid Email", "INVALID_EMAIL");
         }
     } else {
-        res.status(400).json(
-            {"error": 
-                {"status": "400",
-                "message": "the request is missing the following information: " + missingInfo
-                }
-            }
-        )
+        sendErrorStatus(res, 400, `Missing data: ${missingInfo.join(" - ")}`, "MISSING_DATA");
     }
 }
 
@@ -146,28 +96,25 @@ exports.addOne = (req,res) => {
 exports.addAdmin = (req,res) => {
     //error message in case of missing required info 422 or 400?
     let missingInfo = [];
-    req.body.username   !== undefined ? '' : missingInfo.push(' username');
-    req.body.firstname  !== undefined ? '' : missingInfo.push(' firstname');
-    req.body.lastname   !== undefined ? '' : missingInfo.push(' lastname');
-    req.body.email      !== undefined ? '' : missingInfo.push(' email');
-    req.body.adress     !== undefined ? '' : missingInfo.push(' adress');
-    req.body.phone      !== undefined ? '' : missingInfo.push(' phone');
-    req.body.password   !== undefined ? '' : missingInfo.push(' password');
+    req.body.username   !== undefined ? "" : missingInfo.push("username");
+    req.body.firstname  !== undefined ? "" : missingInfo.push("firstname");
+    req.body.lastname   !== undefined ? "" : missingInfo.push("lastname");
+    req.body.email      !== undefined ? "" : missingInfo.push("email");
+    req.body.adress     !== undefined ? "" : missingInfo.push("adress");
+    req.body.phone      !== undefined ? "" : missingInfo.push("phone");
+    req.body.password   !== undefined ? "" : missingInfo.push("password");
     
-    if (missingInfo == '') {
-        function validateEmail(email) {
-            let emailregex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            return emailregex.test(email);
-        }
+    if (missingInfo.length === 0) {
         //check if is a valid email adress with regulaar expressions
         if(validateEmail(req.body.email)){
-            let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
-                                FROM users 
-                                WHERE username = ? OR email = ?`;
+            let sql =  
+                `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
+                FROM users 
+                WHERE username = ? OR email = ?`;
             sequelize.query( sql, {
                 replacements: [req.body.username, req.body.email], type:sequelize.QueryTypes.SELECT
-            }).then(repeated_user => {
-                if (repeated_user.length === 0) {
+            }).then(repeated_users => {
+                if (repeated_users.length === 0) {
                     /*hashing password before sending information*/
                     reqs.bcrypt.genSalt(reqs.saltRounds, function(err, salt) {
                         reqs.bcrypt.hash(req.body.password, salt, function(err, hash) {
@@ -181,7 +128,7 @@ exports.addAdmin = (req,res) => {
                                 phone      : req.body.phone,
                                 password   : hash,
                                 last_order : 0,
-                                is_admin   : 'TRUE'
+                                is_admin   : 1
                             };
                             let sql = `INSERT INTO users VALUES (:user_id, :username, :firstname, :lastname, :email, :adress, :phone, :password, :last_order, :is_admin)`;
                             sequelize.query( sql, {
@@ -190,94 +137,32 @@ exports.addAdmin = (req,res) => {
                                 user.user_id = result[0];
                                 delete user.password;
                                 res.status(200).json(user);
-                                /*it should also return the token so it can be already logged in ?*/
+                                /*it could also return the token so it can be already logged in */
                             }).catch((err)=>{
-                                res.status(500).json(
-                                    {"error": 
-                                        {"status": "500",
-                                        "message": "Internal Server Error: " + err
-                                        }
-                                    }
-                                )
+                                sendErrorStatus(res, 500, `Internal Server Error: ${err}`, "SERVER_ERROR");
                             })
                         });
                     });
                 } else {
                     //error handling when there is/are repeated username and/or email
-                    let email = 0;
-                    let name = 0;
+                    let email = false;
+                    let username = false;
                     //checking what is repeated
-                    repeated_user.forEach(oneUser => {
-                        if (oneUser.username === req.body.username && oneUser.email === req.body.email) {
-                            email++;
-                            name++;
-                        } else if (oneUser.username === req.body.username) {
-                            name++;
-                        } else if (oneUser.email === req.body.email) {
-                            email++;
-                        } 
+                    repeated_users.forEach(repeated_user => {
+                        email += (repeated_user.email === req.body.email ? true : email);
+                        username += (repeated_user.username === req.body.username ? true : username);
                     });
                     //sending error message
-                    if (email > 0 && name > 0) {
-                        res.status(400).json(
-                            {"error": 
-                                {"status": "400",
-                                "message": "user with this username and email already exists in our database"
-                                }
-                            }
-                        )
-                    } else if (name > 0) {
-                        res.status(400).json(
-                            {"error": 
-                                {"status": "400",
-                                "message": "user with this username already exists in our database"
-                                }
-                            }
-                        )
-                    } else if (email > 0) {
-                        res.status(400).json(
-                            {"error": 
-                                {"status": "400",
-                                "message": "user with this email already exists in our database"
-                                }
-                            }
-                        )
-                    } else {
-                        res.status(400).json(
-                            {"error": 
-                                {"status": "400",
-                                "message": "user with this username or email already exists in our database"
-                                }
-                            }
-                        )
-                    }
+                    sendErrorStatus(res, 400, `${email && username ? "Username and email" : (email ? "Email" : "Username")} already exists`, "REPEATED_DATA");
                 }
             }).catch((err)=>{
-                res.status(500).json(
-                    {"error": 
-                        {"status": "500",
-                        "message": "Internal Server Error: " + err
-                        }
-                    }
-                )
+                sendErrorStatus(res, 500, `Internal Server Error: ${err}`, "SERVER_ERROR");
             })
         } else {
-            res.status(400).json(
-                {"error": 
-                    {"status": "400",
-                    "message": "email adress sent in the request is not valid"
-                    }
-                }
-            )
+            sendErrorStatus(res, 400, "Invalid Email", "INVALID_EMAIL");
         }
     } else {
-        res.status(400).json(
-            {"error": 
-                {"status": "400",
-                "message": "the request is missing the following information: " + missingInfo
-                }
-            }
-        )
+        sendErrorStatus(res, 400, `Missing data: ${missingInfo.join(" - ")}`, "MISSING_DATA");
     }
 }
 
@@ -288,80 +173,48 @@ exports.findAll = (req,res) => {
         type:sequelize.QueryTypes.SELECT
     }).then(all_users => {
         if (all_users.length === 0) {
-            res.status(404).json(
-                {"error": 
-                    {"status": "404",
-                    "message": "database doesn't have any users yet"
-                    }
-                }
-            )
+            sendErrorStatus(res, 404, "Database doesn't have any users", "NOT_EXIST");
         } else {
             res.status(200).json(all_users);
         }
     }).catch((err)=>{
-        res.status(500).json(
-            {"error": 
-                {"status": "500",
-                "message": "Internal Server Error: " + err
-                }
-            }
-        )
+        sendErrorStatus(res, 500, `Internal Server Error: ${err}`, "SERVER_ERROR");
     })
 }
 
 /*-----------------SEE A USER-----------------*/
 exports.findOne = (req, res) => {
-    if(req.user[0].user_id == req.params.id || req.user[0].is_admin === 'TRUE'){
-        let sql =  `SELECT user_id, username, firstname, lastname, email, adress, phone, last_order, is_admin 
-                        FROM users 
-                        WHERE user_id = ?`;
+    if(req.user[0].user_id == req.params.id || req.user[0].is_admin){
+        let sql =  
+            `SELECT user_id, username, firstname, lastname, email, adress, phone, last_order, is_admin 
+            FROM users 
+            WHERE user_id = ?`;
         sequelize.query( sql, {
             replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
         }).then(user => {
             if (user.length === 0) {
-                res.status(404).json(
-                    {"error": 
-                        {"status":"404",
-                        "message":`user with the id ${req.params.id} doens't exist in our database.`
-                        }
-                    }
-                )
+                sendErrorStatus(res, 404, `User with the id ${req.params.id} doesn't exist`, "NOT_EXIST");
             } else {
                 res.status(200).json(user[0]);
             }
         }).catch((err)=>{
-            res.status(500).json(
-                {"error": 
-                    {"status": "500",
-                    "message": "Internal Server Error: " + err
-                    }
-                }
-            )
+            sendErrorStatus(res, 500, `Internal Server Error: ${err}`, "SERVER_ERROR");
         })
     } else {
-        res.status(403).json(
-            {"error": 
-                {"status": "403",
-                "message": "user not authorized to see this information"
-                }
-            }
-        )
+        sendErrorStatus(res, 403, "User not authorized to use this resource", "NO_AUTH"); 
     }
 }
 
 /*-----------------UPDATE A USER-----------------*/
 exports.updateOne = (req,res) => {
     if(req.user[0].user_id == req.params.id){
-        function validateEmail(email) {
-            let emailregex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            return emailregex.test(email);
-        }
         //check if is a valid email adress with regulaar expressions
         if(req.body.email === undefined || validateEmail(req.body.email)){
             /*Search for the current user object*/
-            let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, password, is_admin
-                        FROM users 
-                        WHERE user_id = ?`;
+            let sql =  
+                `SELECT username, firstname, lastname, email, adress, phone, last_order, password, is_admin
+                FROM users 
+                WHERE user_id = ?`;
             sequelize.query( sql, {
                 replacements: [req.params.id], type:sequelize.QueryTypes.SELECT
             }).then(result => {
@@ -385,76 +238,42 @@ exports.updateOne = (req,res) => {
                                     last_order : req.body.last_order !== undefined ? req.body.last_order : current_user[0].last_order,
                                     is_admin   : current_user[0].is_admin
                                 };
-                                let sql =  `UPDATE users SET username = :username, firstname = :firstname, lastname = :lastname, email = :email, adress = :adress, phone = :phone, password = :password, last_order = :last_order, is_admin = :is_admin
-                                            WHERE user_id = :user_id`;
+                                let sql =  
+                                    `UPDATE users SET username = :username, firstname = :firstname, lastname = :lastname, email = :email, adress = :adress, phone = :phone, password = :password, last_order = :last_order, is_admin = :is_admin
+                                    WHERE user_id = :user_id`;
                                 sequelize.query( sql, {
                                     replacements: changed_user
                                 }).then(result => {
                                     delete changed_user.password;
                                     res.status(200).json(changed_user);
                                 }).catch((err)=>{
-                                    res.status(500).json(
-                                        {"error": 
-                                            {"status": "500",
-                                            "message": "Internal Server Error: " + err
-                                            }
-                                        }
-                                    )
+                                    sendErrorStatus(res, 500, `Internal Server Error: ${err}`, "SERVER_ERROR");
                                 })           
                             }
                             //repetead username or email validation - only if new email or username info is sent
                             if(req.body.username !== undefined || req.body.email !== undefined){
-                                let sql =  `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
-                                FROM users 
-                                WHERE (username = ? OR email = ?) AND user_id != ?`;
+                                let sql =  
+                                    `SELECT username, firstname, lastname, email, adress, phone, last_order, is_admin 
+                                    FROM users 
+                                    WHERE (username = ? OR email = ?) AND user_id != ?`;
                                 sequelize.query( sql, {
                                     replacements: [req.body.username, req.body.email, req.params.id], type:sequelize.QueryTypes.SELECT
-                                }).then(repeated_user => {
+                                }).then(repeated_users => {
                                     //error message in case of repeated username or email
-                                    if (repeated_user.length !== 0) {
+                                    if (repeated_users.length !== 0) {
                                         let email = false;
                                         let username = false;
-                                        for ( let i = 0; i < repeated_user.length; i++ ){
-                                            if ( repeated_user[i].username === req.body.username ) { username = true }
-                                            if ( repeated_user[i].email === req.body.email ) { email = true }
-                                        }
-                                        if ( email === true && username === true ){
-                                            res.status(400).json(
-                                                {"error": 
-                                                    {"status": "400",
-                                                    "message": "user with the username: "+ req.body.username + " and email: " + req.body.email + " already exists in our database"
-                                                    }
-                                                }
-                                            )
-                                        } else if ( email === true ) {
-                                            res.status(400).json(
-                                                {"error": 
-                                                    {"status": "400",
-                                                    "message": "user with the email: " + req.body.email + " already exists in our database"
-                                                    }
-                                                }
-                                            )
-                                        } else {
-                                            res.status(400).json(
-                                                {"error": 
-                                                    {"status": "400",
-                                                    "message": "user with the username: "+ req.body.username + " already exists in our database"
-                                                    }
-                                                }
-                                            )
-                                        }
+                                        repeated_users.forEach(repeated_user => {
+                                            username = (repeated_user.username === req.body.username ? true : username);
+                                            email = ( repeated_user.email === req.body.email  ? true : email);
+                                        })   
+                                        sendErrorStatus(res, 400, `${email && username ? "Username and email" : (email ? "Email" : "Username")} already exists`, "REPEATED_DATA");
                                     //if not repeated update user
                                     } else {
                                         updateUser();
                                     }
                                 }).catch((err)=>{
-                                    res.status(500).json(
-                                        {"error": 
-                                            {"status": "500",
-                                            "message": "Internal Server Error: " + err
-                                            }
-                                        }
-                                    )
+                                    sendErrorStatus(res, 500, `Internal Server Error: ${err}`, "SERVER_ERROR");
                                 })
                             } else {
                                 //if not email or username info sent user updated without the extra query
@@ -463,113 +282,84 @@ exports.updateOne = (req,res) => {
                         });
                     });
                 } else {
-                    res.status(404).json(
-                        {"error": 
-                            {"status":"404",
-                            "message":`user with the id ${req.params.id} doens't exist in our database.`
-                            }
-                        }
-                    )
+                    sendErrorStatus(res, 404, `User with the id ${req.params.id} doesn't exist in our database`, "NOT_EXIST");
                 }
             }).catch((err)=>{
-                res.status(500).json(
-                    {"error": 
-                        {"status": "500",
-                        "message": "Internal Server Error: " + err
-                        }
-                    }
-                )
+                sendErrorStatus(res, 500, `Internal Server Error: ${err}`, "SERVER_ERROR");
             })
         } else {
-            res.status(400).json(
-                {"error": 
-                    {"status": "400",
-                    "message": "email adress sent in the request is not valid"
-                    }
-                }
-            )
+            sendErrorStatus(res, 400, "Invalid email", "INVALID_EMAIL");
         }
     } else {
-        res.status(403).json(
-            {"error": 
-                {"status": "403",
-                "message": "user not authorized to see this information"
-                }
-            }
-        )
+        sendErrorStatus(res, 403, "User not authorized to use this resource", "NO_AUTH");
     }
 }
 
 /*-----------------DELETE A USER-----------------*/
 exports.deleteOne = (req, res) => {
-    if(req.user[0].user_id == req.params.id || req.user[0].is_admin === 'TRUE'){
-        let sql =  `DELETE FROM users 
-                    WHERE user_id = ?`;
+    if(req.user[0].user_id == req.params.id || req.user[0].is_admin){
+
+        let sql =  
+            `DELETE FROM users 
+            WHERE user_id = ?`;
         sequelize.query( sql, {
             replacements: [req.params.id]
         }).then(deleted_user => {
             if (deleted_user[0].affectedRows === 0){
-                res.status(404).send(`Error: usuario con id ${req.params.id} no existente`);
+                sendErrorStatus(res, 404, `User with id ${req.params.id} doesn't exist`, "NOT_EXIST");
             } else {
                 res.status(200).json(`Successfully deleted user with the id: ${req.params.id}`);                
             }
         }).catch((err)=>{
-            res.status(500).json(
-                {"error": 
-                    {"status": "500",
-                    "message": "Internal Server Error: " + err
-                    }
-                }
-            )
+            sendErrorStatus(res, 500, `Internal Server Error: ${err}`, "SERVER_ERROR");
         })
     } else {
-        res.status(403).json(
-            {"error": 
-                {"status": "403",
-                "message": "user not authorized to delete this user"
-                }
-            }
-        )
+        sendErrorStatus(res, 403, "User not authorized to use this resource", "NO_AUTH");
     }
 }
 
 /*---------------------------------------------USER LOG IN--------------------------------------------*/
 exports.login = (req,res) => {
-    const jwtPass = reqs.jwtPass;
-    let sql =  `SELECT * FROM users 
-                WHERE (username = :username OR email = :email)`;
-    sequelize.query( sql, {
-        replacements: {username : req.body.username , email: req.body.username}, type:sequelize.QueryTypes.SELECT
-    }).then(result => {
-        async function checkPass (){
-            const match = await reqs.bcrypt.compare(req.body.password, result[0].password);
-            console.log('1:' + match);
-            /*error management*/
-            if (match){
-                /*token created and sent when correct data is given*/
-                let user_id = result[0].user_id;
-                const token = reqs.jwt.sign({
-                    user_id,
-                }, jwtPass);
-                res.status(200).json({token: token, user_id: user_id});
-            } else {
-                res.status(401).json(
-                    {"error": 
-                        {"status": "401",
-                        "message": "user information sent is incorrect"
-                        }
+    let missingInfo = [];
+    req.body.username   !== undefined ? "" : missingInfo.push("username");
+    req.body.email      !== undefined ? "" : missingInfo.push("email");
+    req.body.password   !== undefined ? "" : missingInfo.push("password");
+
+    if (missingInfo.length <= 1 && missingInfo[0] !== "password") {
+        const jwtPass = reqs.jwtPass;
+        let sql = `SELECT * FROM users `;
+        sql += (req.body.username !== undefined && req.body.email !== undefined) ? 
+            `WHERE (username = :username AND email = :email)` : 
+            (req.body.username !== undefined) ?
+            `WHERE (username = :username)` :
+            `WHERE (email = :email)`;
+        sequelize.query( sql, {
+            replacements: {username : req.body.username , email: req.body.email}, type:sequelize.QueryTypes.SELECT
+        }).then(result => {
+            if(result.length !== 0){
+
+                async function checkPass (){
+                    const match = await reqs.bcrypt.compare(req.body.password, result[0].password);
+                    /*error management*/
+                    if (match){
+                        /*token created and sent when correct data is given*/
+                        let user_id = result[0].user_id;
+                        const token = reqs.jwt.sign({
+                            user_id,
+                        }, jwtPass);
+                        res.status(200).json({token: token, user_id: user_id});
+                    } else {
+                        sendErrorStatus(res, 401, "Incorrect user credentials", "INCORRECT_DATA");
                     }
-                )
-            }
-        }
-        checkPass();
-    }).catch((err)=>{
-        res.status(500).json(
-            {"error": 
-                {"status": "500",
-                "message": "Internal Server Error: " + err
                 }
+                checkPass();
+            } else {
+                sendErrorStatus(res, 404, "No user with these credentials", "NOT_EXIST");
             }
-        )
-    })
+        }).catch((err)=>{
+            sendErrorStatus(res, 500, `Internal Server Error: ${err}`, "SERVER_ERROR");
+        })
+    } else {
+        sendErrorStatus(res, 403, `Missing information: ${missingInfo.join(" - ")}`, "MISSING_DATA");
+    }
 }

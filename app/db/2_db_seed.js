@@ -6,32 +6,32 @@ const sequelize = require('../config/db_config');
 /*---------------------------------------------CREATE ADMINS USERS--------------------------------------------*/
 let dbsql = [ 
     `INSERT INTO ${db_data.conf_db_name}.users (user_id, username, firstname, lastname, email, adress, phone, password, last_order, is_admin) VALUES
-        (3, 'JonnieBins', 'Jonas', 'Bins', 'jonbins@zoie.me', '3656 Watsica Forest', 1518432774, '$2b$10$kFViDKSpDnijo3icqvMIHuBIeyxe5V0kA1vWWvKEYxaaHDoKpy1nG', 12, 'FALSE'),
-        (4, 'Carmelo', 'Marcelino', 'McKenzie', 'marcemc@lonnie.biz', '02362 Uriah Burgs', 1399367233, '$2b$10$BjWt4G5/Uzf.PoIWYcMjU.4GtltIqx4Ce5iSOuuvZCjGx9X3o9oKW', 9, 'FALSE'),
-        (5, 'DaniH', 'Daniela', 'Hyatt', 'dani@ethelyn.tv', '05305 Hoeger Orchard', 2147483647, '$2b$10$wBC7KnYDeweEibF1fNSogeoaYPu4SYnwvxjK6p1j.YaJOmyT.IOw.', 13, 'FALSE'),
-        (6, 'TriishhK', 'Trisha', 'Kling', 'triish@rubie.me', '415 Jerome Lock', 2147483647, '$2b$10$yFBtfSXXnONdWO2u47fYGe6MlJNuePZvV82Lpo2cVk9EWfUzkbbR2', 15, 'FALSE'),
-        (7, 'Anika', 'Anika', 'Zemlak', 'anikazemlak@jarrell.info', '5721 Tavares Avenue', 2147483647, '$2b$10$nsokCmGigSFaRxhQOtV6ouaLnx.1NWQcc/I/jEfEn930lo3bPuGYa', 5, 'FALSE'),
-        (8, 'KaylahB', 'Kaylah', 'Braun', 'kaykay@college,edu', '33304 Rogers Streets', 2147483647, '$2b$10$zQ7OAPguIk6UIUvzJZSlKeF6r525q9a6zOmIQW8oYHGThL1p4QkZ2', 0, 'FALSE'),
-        (9, 'Ethelina', 'Ethel', 'Roob', 'roobethel@fakemail.com', '998 Walker Corner', 2147483647, '$2b$10$a9zJaqwvTHdq1ZmXBeJYHuI6TEsdxq1kXN94.yMO20Ysfy6KQpafS', 0, 'FALSE'),
-        (10, 'JayKing', 'Jayden', 'Kuhn', 'jayjay@elavionc.ito', '423 Consuelo Garden', 2147483647, '$2b$10$bBi2wKNkP6omaRS.7nFuT.81NLyDNCGATuYZXLWi5m8BP67hZewMG', 0, 'FALSE'),
-        (11, 'Braz', 'Braxton', 'Lavina', 'blavina@mail.me', '3782 Kirlin Unions', 2147483647, '$2b$10$lgQPwq2m6KlLnQVIJuRWDeHtSGbp9vMvhnRYrk5YbsHjXaNbca.de', 4, 'FALSE'),
-        (12, 'TobyPadberg', 'Toby', 'Padberg', 'tpadber@fakest.org', '11558 Easter Ways', 1518875408, '$2b$10$7cJuetJ8vSmS/64vO.lyVOJSiiGkfzkfH/TUiTjbUfspieaBzg6te', 0, 'FALSE'),
-        (13, 'Keirara', 'Keira', 'Ruecker', 'keirrue@company.com', '5093 Wiegand Rapids', 2147483647, '$2b$10$5XjY04UoxhmYtIq1WI7HrO/saOYIi2TI570V4aGzWd8ule/IdCe5.', 11, 'FALSE'),
-        (14, 'KylaHintz', 'Kyla', 'Hintz', 'kyla_hintz@lexus.ca', '64778 Brett Spring', 2147483647, '$2b$10$QOonD6MTTq/vSW1fS39BZ.P.d6YsIGB1e0li8k0boUOlExTeWOSu6', 0, 'FALSE'),
-        (15, 'Amayita', 'Amaya', 'Nakia', 'Nakiaa@company,com', '78315 Stoltenberg Orchard', 2147483647, '$2b$10$wWWSiqzQwUC902vB.thcZ.gqUh59YyN2fqiOHdRY1jY5L576ycPfm', 3, 'FALSE'),
-        (16, 'PaoGrimes', 'Paolo', 'Grimes', 'paolog@carmine.co.uk', '9580 Serenity Green', 2147483647, '$2b$10$BHKRopreF4KTrIFoD3PSj.JzTmClN79vVqio.AMdgzWYOWwWh6Bdq', 0, 'FALSE'),
-        (17, 'ElliSanford', 'Ellis', 'Sanford', 'ellissandford@college.com', '08337 Greenfelder Summit', 2147483647, '$2b$10$2vnDrwBAPOIlOLcWo70ZoOwo8xD3kLkfrxHA1EhpGqHtA73kALw0u', 0, 'FALSE'),
-        (18, 'Fadel', 'Oleta', 'Fadel', 'oletfadel@college.com', '955 Nikolas Forest', 1670218545, '$2b$10$i.XpKzBFDKuoQIebQsuAkOetT1p15XGJUF7udss6BpiCRvLWslLOK', 0, 'FALSE'),
-        (19, 'JoeyRie', 'Joey', 'McLaughlin', 'mclaughlin@mail.ar', '44786 Trent Cliff', 1431879482, '$2b$10$8.pNMIhkz4T/9GmXKfhJMeTdEDJt78BLOnAz6Onij.llM6gdfZqUa', 0, 'FALSE'),
-        (20, 'EthanF', 'Ethan', 'Ford', 'ethan@kattie.ca', '268 Deanna Stream', 2147483647, '$2b$10$hOEzIkTQ2G3TWzCYN0TTR.OwyN5J422q/T6bdFJPELCh0XAuFqBx6', 0, 'FALSE'),
-        (21, 'WesEast', 'Westley', 'Clifford', 'thewest@college.ar', '0206 Trevor Spurs', 2147483647, '$2b$10$liNe7tA871aNmQiR7t6FUOcVZuWWzefP/l1yTHJZe44WLEwSXkEGy', 6, 'FALSE'),
-        (22, 'Margarita', 'Margret', 'Stracke', 'margiestracke@mail.me', '28250 Ritchie Lane', 1616177886, '$2b$10$Y0yF4vXNrdBjYUfKboUO0eprKdGeEvV5okfw3uWZrgS.mE6shN91O', 0, 'FALSE'),
-        (23, 'DarrWhite', 'Darrell', 'White', 'notfromtheoffice@mail.com', '746 Gibson Road', 1608614033, '$2b$10$Ybu7Ry901fisNSaUm79FyuLIIt6i8MOT/6NnmM4VtCeBIZ8O4s4Ee', 0, 'FALSE'),
-        (24, 'GilPrice', 'Gilberto', 'Price', 'gilprice@health.edu', '0461 Keegan Cape', 1526287604, '$2b$10$GBcQjNwuoz0RiKZdM6HmiOzRICQIbgCCqYu1Wfc1d08VETUys3stq', 7, 'FALSE'),
-        (25, 'RiceChelsey', 'Chelsey', 'Rice', 'chelset_rice@college.com', '292 Ron Lock', 1896270724, '$2b$10$KwiTK4KebxcORDQVk.cZf.zQvfzl2wtr.vLppMu283Tp3esUYlGOC', 0, 'FALSE'),
-        (26, 'NickieNick', 'Nicholas', 'Huel', 'nickhuel@anothermail.edu', '733 Vandervort Meadows', 2147483647, '$2b$10$Fz9yIsyETwCS36KhcQFbTuvhzGsbvIrYIAkj1uErJ/xuWU6F57aPa', 10, 'FALSE'),
-        (27, 'Estelle', 'Estelle', 'Wisoky', 'wisoky@company.org', '115 Elissa Lodge', 2147483647, '$2b$10$j7IvBqFrujcURpjI2p1TQOEyRXfxhhGcvjWxHJAwze6YYVqMSpFey', 8, 'FALSE'),
-        (28, 'JediMaster', 'Luke', 'Skywalker', 'lukeskywalker@jedi.sw', '526 Tatooine', 1545879563, '$2b$10$t5n2/8XzmBGvryK2Mi8.j.VBJVCaqaNQzZDoZd4ifRDg.KUDAx/0q', 14, 'FALSE');`,
+        (3, 'JonnieBins', 'Jonas', 'Bins', 'jonbins@zoie.me', '3656 Watsica Forest', 1518432774, '$2b$10$kFViDKSpDnijo3icqvMIHuBIeyxe5V0kA1vWWvKEYxaaHDoKpy1nG', 12, 0),
+        (4, 'Carmelo', 'Marcelino', 'McKenzie', 'marcemc@lonnie.biz', '02362 Uriah Burgs', 1399367233, '$2b$10$BjWt4G5/Uzf.PoIWYcMjU.4GtltIqx4Ce5iSOuuvZCjGx9X3o9oKW', 9, 0),
+        (5, 'DaniH', 'Daniela', 'Hyatt', 'dani@ethelyn.tv', '05305 Hoeger Orchard', 2147483647, '$2b$10$wBC7KnYDeweEibF1fNSogeoaYPu4SYnwvxjK6p1j.YaJOmyT.IOw.', 13, 0),
+        (6, 'TriishhK', 'Trisha', 'Kling', 'triish@rubie.me', '415 Jerome Lock', 2147483647, '$2b$10$yFBtfSXXnONdWO2u47fYGe6MlJNuePZvV82Lpo2cVk9EWfUzkbbR2', 15, 0),
+        (7, 'Anika', 'Anika', 'Zemlak', 'anikazemlak@jarrell.info', '5721 Tavares Avenue', 2147483647, '$2b$10$nsokCmGigSFaRxhQOtV6ouaLnx.1NWQcc/I/jEfEn930lo3bPuGYa', 5, 0),
+        (8, 'KaylahB', 'Kaylah', 'Braun', 'kaykay@college,edu', '33304 Rogers Streets', 2147483647, '$2b$10$zQ7OAPguIk6UIUvzJZSlKeF6r525q9a6zOmIQW8oYHGThL1p4QkZ2', 0, 0),
+        (9, 'Ethelina', 'Ethel', 'Roob', 'roobethel@fakemail.com', '998 Walker Corner', 2147483647, '$2b$10$a9zJaqwvTHdq1ZmXBeJYHuI6TEsdxq1kXN94.yMO20Ysfy6KQpafS', 0, 0),
+        (10, 'JayKing', 'Jayden', 'Kuhn', 'jayjay@elavionc.ito', '423 Consuelo Garden', 2147483647, '$2b$10$bBi2wKNkP6omaRS.7nFuT.81NLyDNCGATuYZXLWi5m8BP67hZewMG', 0, 0),
+        (11, 'Braz', 'Braxton', 'Lavina', 'blavina@mail.me', '3782 Kirlin Unions', 2147483647, '$2b$10$lgQPwq2m6KlLnQVIJuRWDeHtSGbp9vMvhnRYrk5YbsHjXaNbca.de', 4, 0),
+        (12, 'TobyPadberg', 'Toby', 'Padberg', 'tpadber@fakest.org', '11558 Easter Ways', 1518875408, '$2b$10$7cJuetJ8vSmS/64vO.lyVOJSiiGkfzkfH/TUiTjbUfspieaBzg6te', 0, 0),
+        (13, 'Keirara', 'Keira', 'Ruecker', 'keirrue@company.com', '5093 Wiegand Rapids', 2147483647, '$2b$10$5XjY04UoxhmYtIq1WI7HrO/saOYIi2TI570V4aGzWd8ule/IdCe5.', 11, 0),
+        (14, 'KylaHintz', 'Kyla', 'Hintz', 'kyla_hintz@lexus.ca', '64778 Brett Spring', 2147483647, '$2b$10$QOonD6MTTq/vSW1fS39BZ.P.d6YsIGB1e0li8k0boUOlExTeWOSu6', 0, 0),
+        (15, 'Amayita', 'Amaya', 'Nakia', 'Nakiaa@company,com', '78315 Stoltenberg Orchard', 2147483647, '$2b$10$wWWSiqzQwUC902vB.thcZ.gqUh59YyN2fqiOHdRY1jY5L576ycPfm', 3, 0),
+        (16, 'PaoGrimes', 'Paolo', 'Grimes', 'paolog@carmine.co.uk', '9580 Serenity Green', 2147483647, '$2b$10$BHKRopreF4KTrIFoD3PSj.JzTmClN79vVqio.AMdgzWYOWwWh6Bdq', 0, 0),
+        (17, 'ElliSanford', 'Ellis', 'Sanford', 'ellissandford@college.com', '08337 Greenfelder Summit', 2147483647, '$2b$10$2vnDrwBAPOIlOLcWo70ZoOwo8xD3kLkfrxHA1EhpGqHtA73kALw0u', 0, 0),
+        (18, 'Fadel', 'Oleta', 'Fadel', 'oletfadel@college.com', '955 Nikolas Forest', 1670218545, '$2b$10$i.XpKzBFDKuoQIebQsuAkOetT1p15XGJUF7udss6BpiCRvLWslLOK', 0, 0),
+        (19, 'JoeyRie', 'Joey', 'McLaughlin', 'mclaughlin@mail.ar', '44786 Trent Cliff', 1431879482, '$2b$10$8.pNMIhkz4T/9GmXKfhJMeTdEDJt78BLOnAz6Onij.llM6gdfZqUa', 0, 0),
+        (20, 'EthanF', 'Ethan', 'Ford', 'ethan@kattie.ca', '268 Deanna Stream', 2147483647, '$2b$10$hOEzIkTQ2G3TWzCYN0TTR.OwyN5J422q/T6bdFJPELCh0XAuFqBx6', 0, 0),
+        (21, 'WesEast', 'Westley', 'Clifford', 'thewest@college.ar', '0206 Trevor Spurs', 2147483647, '$2b$10$liNe7tA871aNmQiR7t6FUOcVZuWWzefP/l1yTHJZe44WLEwSXkEGy', 6, 0),
+        (22, 'Margarita', 'Margret', 'Stracke', 'margiestracke@mail.me', '28250 Ritchie Lane', 1616177886, '$2b$10$Y0yF4vXNrdBjYUfKboUO0eprKdGeEvV5okfw3uWZrgS.mE6shN91O', 0, 0),
+        (23, 'DarrWhite', 'Darrell', 'White', 'notfromtheoffice@mail.com', '746 Gibson Road', 1608614033, '$2b$10$Ybu7Ry901fisNSaUm79FyuLIIt6i8MOT/6NnmM4VtCeBIZ8O4s4Ee', 0, 0),
+        (24, 'GilPrice', 'Gilberto', 'Price', 'gilprice@health.edu', '0461 Keegan Cape', 1526287604, '$2b$10$GBcQjNwuoz0RiKZdM6HmiOzRICQIbgCCqYu1Wfc1d08VETUys3stq', 7, 0),
+        (25, 'RiceChelsey', 'Chelsey', 'Rice', 'chelset_rice@college.com', '292 Ron Lock', 1896270724, '$2b$10$KwiTK4KebxcORDQVk.cZf.zQvfzl2wtr.vLppMu283Tp3esUYlGOC', 0, 0),
+        (26, 'NickieNick', 'Nicholas', 'Huel', 'nickhuel@anothermail.edu', '733 Vandervort Meadows', 2147483647, '$2b$10$Fz9yIsyETwCS36KhcQFbTuvhzGsbvIrYIAkj1uErJ/xuWU6F57aPa', 10, 0),
+        (27, 'Estelle', 'Estelle', 'Wisoky', 'wisoky@company.org', '115 Elissa Lodge', 2147483647, '$2b$10$j7IvBqFrujcURpjI2p1TQOEyRXfxhhGcvjWxHJAwze6YYVqMSpFey', 8, 0),
+        (28, 'JediMaster', 'Luke', 'Skywalker', 'lukeskywalker@jedi.sw', '526 Tatooine', 1545879563, '$2b$10$t5n2/8XzmBGvryK2Mi8.j.VBJVCaqaNQzZDoZd4ifRDg.KUDAx/0q', 14, 0);`,
     `ALTER TABLE ${db_data.conf_db_name}.users
         MODIFY user_id int(64) AUTO_INCREMENT NOT NULL, AUTO_INCREMENT=29;`,
 
@@ -145,7 +145,7 @@ let dbsql = [
 
 sequelize.query( dbsql, {
     }).then(result => {
-        console.log('Datos agregados con éxito')
+        console.log('Seed data successfully added')
     }).catch((err)=>{
         console.log( 'Error: ' + err );
 })
