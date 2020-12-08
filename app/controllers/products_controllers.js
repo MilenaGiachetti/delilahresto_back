@@ -1,18 +1,12 @@
 /*---------------------------------------------REQUIREMENTS--------------------------------------------*/
 const sequelize = require("../config/db_config");
 
-const validateEmail = (email) => {
-    let emailregex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return emailregex.test(email);
-}
-
 const sendErrorStatus = (res, status, message, code) => {
     res.status(status).json({
         "error":{
             "status"  : status,
             "message" : message,
             "code"    : code
-            // add short code for easy recognition from front. Ex. Code: "MISSING_INFO", "INVALID_EMAIL", "NOT_EXIST", "SERVER_ERROR", "NO_AUTH", "INCORRECT_DATA", "REPEATED_DATA"
         }
     })
 };
