@@ -26,7 +26,7 @@ exports.addOne = (req,res) => {
     req.body.firstname  !== undefined ? "" : missingInfo.push("firstname");
     req.body.lastname   !== undefined ? "" : missingInfo.push("lastname");
     req.body.email      !== undefined ? "" : missingInfo.push("email");
-    req.body.address     !== undefined ? "" : missingInfo.push("address");
+    req.body.address    !== undefined ? "" : missingInfo.push("address");
     req.body.phone      !== undefined ? "" : missingInfo.push("phone");
     req.body.password   !== undefined ? "" : missingInfo.push("password");
     
@@ -50,7 +50,7 @@ exports.addOne = (req,res) => {
                                 firstname  : req.body.firstname,
                                 lastname   : req.body.lastname,
                                 email      : req.body.email,
-                                address     : req.body.address,
+                                address    : req.body.address,
                                 phone      : req.body.phone,
                                 password   : hash,
                                 last_order : 0,
@@ -232,7 +232,7 @@ exports.updateOne = (req,res) => {
                                     firstname  : req.body.firstname  !== undefined ? req.body.firstname  : current_user[0].firstname,
                                     lastname   : req.body.lastname   !== undefined ? req.body.lastname   : current_user[0].lastname,
                                     email      : req.body.email      !== undefined ? req.body.email      : current_user[0].email,
-                                    address     : req.body.address     !== undefined ? req.body.address     : current_user[0].address,
+                                    address    : req.body.address    !== undefined ? req.body.address    : current_user[0].address,
                                     phone      : req.body.phone      !== undefined ? req.body.phone      : current_user[0].phone,
                                     password   : req.body.password   !== undefined ? hash  : current_user[0].password,
                                     last_order : req.body.last_order !== undefined ? req.body.last_order : current_user[0].last_order,

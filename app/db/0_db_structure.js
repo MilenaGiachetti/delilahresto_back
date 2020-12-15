@@ -11,7 +11,6 @@ const sequelize   = new Sequelize('', db_data.conf_user , db_data.conf_password,
     }
 });
 
-console.log(db_data)
 /*---------------------------------------------CREATE DATABASE and TABLES--------------------------------------------*/
 let dbsql = [   
     `SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";`,
@@ -27,8 +26,8 @@ let dbsql = [
     `CREATE TABLE ${db_data.conf_db_name}.orders (    
         order_id int(64) NOT NULL PRIMARY KEY AUTO_INCREMENT,   
         description varchar(64) NOT NULL,    
-        payment enum('efectivo','credito','debito') NOT NULL,    
-        order_state enum('nuevo','confirmado','preparando','enviando','entregado','cancelado') NOT NULL DEFAULT 'nuevo',    
+        payment int(1) NOT NULL,
+        order_state int(1) NOT NULL DEFAULT 0,
         time timestamp NOT NULL DEFAULT current_timestamp(),      
         total_price int(8) NOT NULL,    
         user_id int(64) NOT NULL  

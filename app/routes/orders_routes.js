@@ -10,7 +10,7 @@ module.exports = app => {
 
     /*example of info to send in the body:
     {
-        "payment": "efectivo",
+        "payment": 2,
         "products": [
             {"product_id": 34,
             "product_quantity":1},
@@ -33,7 +33,7 @@ module.exports = app => {
 
     /*example of info to send in the body:
     {
-        "order_state" : "cancelado"
+        "order_state" : 5
     }*/
 
     /*-----------------DELETE A ORDER-----------------*/

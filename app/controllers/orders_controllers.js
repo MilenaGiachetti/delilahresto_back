@@ -19,21 +19,21 @@ exports.addOne = (req,res) => {
     -make the order total payment (I dont know if this is needed because the client should know before this info is sent to the back-end)
     -make array of objects to send to the join db products_orders
     */
-   if (req.body.payment === "efectivo" || req.body.payment === "credito" || req.body.payment === "debito") {
-       if(req.body.payment === undefined || req.body.products === undefined || req.body.products[0] === undefined || req.body.products[0].product_id === undefined || req.body.products[0].product_quantity === undefined){
+    const payment_list = ["cash", "debit", "credit"];
+    if (req.body.payment >= 0 && req.body.payment <= 2) {
+        if(req.body.payment === undefined || req.body.products === undefined || req.body.products[0] === undefined || req.body.products[0].product_id === undefined || req.body.products[0].product_quantity === undefined){
             sendErrorStatus(res, 400, `Missing information`, "MISSING_DATA");
         } else {
-            let description = "";
-            let products_order = [];
-            let total_price = 0;
+            let description    = "",
+                products_order = [],
+                total_price    = 0;
             async function get(){
-                let total_product_quantity = req.body.products.length;
                 let product_number = 0;
-                for(let i = 0; i < total_product_quantity; i++){
+                for(let i = 0; i < req.body.products.length; i++){
                     let current_product_id = req.body.products[i].product_id;
-                    let current_product_quantity =req.body.products[i].product_quantity;
+                    let current_product_quantity = req.body.products[i].product_quantity;
                     
-                    let sql = `SELECT * FROM products WHERE product_id = ?`;
+                    const sql = `SELECT * FROM products WHERE product_id = ?`;
                     await sequelize.query( sql, {
                         replacements: [current_product_id], type:sequelize.QueryTypes.SELECT
                     }).then(result => {
@@ -51,7 +51,7 @@ exports.addOne = (req,res) => {
                                 "user_id"          : req.user[0].user_id
                             })
                             /*Checking for the last iteration so the info can be sent to be inserted in the order and products_orders tables */
-                            if(product_number === total_product_quantity){
+                            if(product_number === req.body.products.length){
                                 insert(products_order, description, total_price);
                             }
                         }
@@ -69,17 +69,17 @@ exports.addOne = (req,res) => {
                     total_price : total_price,
                     user_id     : req.user[0].user_id
                 };
-                let sql = 
+                const sql = 
                     `INSERT INTO orders
                     SET description = :description, payment = :payment, order_state = :order_state, total_price= :total_price, user_id = :user_id`;
                 sequelize.query( sql, {
                     replacements: order
                 }).then(result => {
-                    let changed_user = {
+                    const changed_user = {
                         user_id    : req.user[0].user_id,
                         last_order : result[0],
                     };
-                    let sql =  
+                    const sql =  
                         `UPDATE users 
                         SET last_order = :last_order
                         WHERE user_id = :user_id`;
@@ -114,16 +114,14 @@ exports.addOne = (req,res) => {
 /*-----------------SEE ALL ORDERS-----------------*/
 exports.findAll = (req, res) => {
     function seeAllOrders (sqlQuery) {
-         let sql = sqlQuery;
+        const sql = sqlQuery;
         sequelize.query( sql, {
             type:sequelize.QueryTypes.SELECT
         }).then(all_orders => {
             if (all_orders.length === 0) {
                 sendErrorStatus(res, 404, "Database doesn't have any order yet", "NOT_EXIST");
             } else {
-                let orders = [];
-                let order;
-                let product;
+                let orders = [], order, product;
                 function createProduct (i) {
                     product = {
                         product_quantity: all_orders[i].product_quantity,
@@ -131,7 +129,7 @@ exports.findAll = (req, res) => {
                         product_name: all_orders[i].product_name,
                         abbreviation: all_orders[i].abbreviation,
                         link_img: all_orders[i].link_img,
-                        price:  all_orders[i].price
+                        price: all_orders[i].price
                     }
                 }
                 function createOrder (i) {
@@ -170,13 +168,13 @@ exports.findAll = (req, res) => {
         })
     }
     if(req.user[0].is_admin){
-        let sql =  
+        const sql =  
             `SELECT * FROM orders 
             INNER JOIN products_orders ON products_orders.order_id = orders.order_id 
             INNER JOIN products ON products_orders.product_id = products.product_id`;
         seeAllOrders (sql);
     } else {
-        let sql =  
+        const sql =  
             `SELECT * FROM orders 
             INNER JOIN products_orders ON products_orders.order_id = orders.order_id 
             INNER JOIN products ON products_orders.product_id = products.product_id 
@@ -282,7 +280,7 @@ exports.findAll = (req, res) => {
 
 /*-----------------SEE A ORDER-----------------*/
 exports.findOne = (req, res) => {
-    let sql =  
+    const sql =  
         `SELECT *
         FROM orders 
         INNER JOIN products_orders ON products_orders.order_id = orders.order_id 
@@ -329,14 +327,9 @@ exports.findOne = (req, res) => {
 /*-----------------UPDATE A ORDER-----------------*/
 /*only order_state can be changed*/
 exports.updateOne = (req,res) => {
-    if (   req.body.order_state === "nuevo" 
-        || req.body.order_state === "confirmado" 
-        || req.body.order_state === "preparando" 
-        || req.body.order_state === "enviando" 
-        || req.body.order_state === "entregado"  
-        || req.body.order_state === "cancelado"){
-
-        let sql =  
+    const order_state_list = ["new", "confirmed", "preparing", "sending", "delivered", "cancelled"];
+    if (req.body.order_state >= 0 && req.body.order_state <= 5){
+        const sql =  
             `UPDATE orders 
             SET  order_state = :order_state
             WHERE order_id = :order_id`;            
@@ -347,7 +340,7 @@ exports.updateOne = (req,res) => {
             if (order[0].affectedRows === 0) {
                 sendErrorStatus(res, 404, `Order doesn't exist in our database or the order already had the order state value given in the request`, "NOT_EXIST");
             } else {
-                res.status(200).json((`Successfully changed state of the order with the id ${req.params.id} to '${req.body.order_state}'`));
+                res.status(200).json((`Successfully changed state of the order with the id ${req.params.id} to '${order_state_list[req.body.order_state]}'`));
             }
         }).catch((err)=>{
             sendErrorStatus(res, 500, `Internal Server Error: ${err}`, "SERVER_ERROR");
@@ -359,7 +352,7 @@ exports.updateOne = (req,res) => {
 
 /*-----------------DELETE A ORDER-----------------*/
 exports.deleteOne = (req,res) => {
-    let sql =  
+    const sql =  
         `DELETE orders, products_orders 
         FROM orders
         INNER JOIN products_orders 
@@ -372,7 +365,7 @@ exports.deleteOne = (req,res) => {
             sendErrorStatus(res, 404, `database doesn't have an order with the id: ${req.params.id}`, "NOT_EXIST");
         } else {
             /*Erased from user as last_order*/
-            let sql =  
+            const sql =  
                 `UPDATE users 
                 SET last_order = ?
                 WHERE last_order = ?`;

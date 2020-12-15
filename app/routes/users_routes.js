@@ -30,8 +30,8 @@ module.exports = app => {
     }
     */
 
-   /*-----------------ADD AN ADMIN-----------------*/
-   router.post('/admins', middlewares.authorizateUser, users.addAdmin);
+    /*-----------------ADD AN ADMIN-----------------*/
+    router.post('/admins', middlewares.authorizateUser, users.addAdmin);
 
     /*-----------------SEE ALL USERS-----------------*/
     router.get('/', middlewares.authorizateUser, users.findAll)
